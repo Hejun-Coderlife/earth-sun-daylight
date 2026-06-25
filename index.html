@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="twilight">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>地球 · 太阳 · 银河 — 日照与天体运动模拟</title>
+<meta name="description" content="可交互的太阳系/地月模拟：昼夜、四季、公转椭圆、日地距离、八大行星、月球、银河行进。中英双语。" />
+<style>
+  :root{
+    --serif:"Noto Serif SC",'Songti SC','Source Han Serif SC',ui-serif,Georgia,serif;
+    --sans:"Noto Sans SC",-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;
+  }
+  html[data-theme="twilight"]{
+    --bg-grad:
+      radial-gradient(1100px 680px at 80% -6%, rgba(120,160,255,.30), transparent 60%),
+      radial-gradient(900px 620px at 6% 108%, rgba(255,190,120,.18), transparent 55%),
+      radial-gradient(700px 500px at 50% 50%, rgba(90,120,210,.12), transparent 70%),
+      linear-gradient(180deg,#1b2750,#22305c 55%,#15203f);
+    --ink:#f3f7ff; --ink-dim:#c4d2f0; --ink-faint:#8fa2cf;
+    --card:rgba(56,74,128,.42); --card-brd:rgba(160,185,255,.30);
+    --line:rgba(170,195,255,.22);
+    --gold:#ffce7a; --gold-soft:#ffe6b8; --blue:#7fb0ff; --cyan:#76ecdd;
+    --shadow:0 22px 60px rgba(8,14,40,.45);
+  }
+  html[data-theme="deep"]{
+    --bg-grad:
+      radial-gradient(1200px 700px at 78% -8%, rgba(70,110,210,.22), transparent 60%),
+      radial-gradient(900px 600px at 8% 110%, rgba(255,180,90,.10), transparent 55%),
+      linear-gradient(180deg,#05070f,#0a0f20 60%,#04060d);
+    --ink:#eaf0ff; --ink-dim:#9fb0d0; --ink-faint:#6c7ba0;
+    --card:rgba(20,28,52,.55); --card-brd:rgba(130,160,230,.18);
+    --line:rgba(150,175,230,.16);
+    --gold:#ffce7a; --gold-soft:#ffe6b8; --blue:#5ea0ff; --cyan:#5fe3d4;
+    --shadow:0 20px 60px rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);background:var(--bg-grad);background-attachment:fixed;color:var(--ink);line-height:1.7;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background .6s}
+  html[lang="en"] body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif}
+  ::selection{background:rgba(255,206,122,.3)}
+  a{color:var(--gold-soft);text-decoration:none}
+
+  header.hero{position:relative;padding:46px 24px 8px;text-align:center;max-width:1180px;margin:0 auto}
+  .eyebrow{font-size:13px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);opacity:.9;margin-bottom:14px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,5vw,50px);line-height:1.15;letter-spacing:.02em;background:linear-gradient(180deg,#fff,#cdddff 70%,#a9c0f0);-webkit-background-clip:text;background-clip:text;color:transparent}
+  html[lang="en"] h1{font-family:Georgia,'Times New Roman',serif}
+  .hero p.lead{margin:16px auto 0;max-width:700px;color:var(--ink-dim);font-size:clamp(14px,2vw,17px)}
+
+  .modebar{max-width:1240px;margin:0 auto;padding:18px 20px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;position:sticky;top:calc((100vh - min(70vh,600px)) / 2 - 76px);z-index:30}
+  @media(max-width:960px){.modebar{position:static}}
+  .mode-btn{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:600;padding:10px 18px;border-radius:999px;border:1px solid var(--card-brd);background:var(--card);color:var(--ink-dim);backdrop-filter:blur(10px);transition:.22s}
+  .mode-btn .e{font-size:17px}
+  .mode-btn:hover{color:var(--ink);border-color:var(--gold);transform:translateY(-2px)}
+  .mode-btn.active{background:linear-gradient(135deg,rgba(255,206,122,.28),rgba(120,160,255,.22));border-color:rgba(255,206,122,.6);color:#fff;box-shadow:0 6px 22px rgba(255,206,122,.18)}
+  .util{display:flex;gap:8px;margin-left:auto}
+  @media(max-width:820px){.util{margin-left:0;width:100%;justify-content:center}}
+  .util button{cursor:pointer;font-size:13.5px;font-weight:600;padding:9px 14px;border-radius:999px;border:1px solid var(--card-brd);background:var(--card);color:var(--ink-dim);transition:.2s}
+  .util button:hover{color:var(--gold-soft);border-color:var(--gold)}
+
+  .stage-wrap{max-width:1240px;margin:18px auto 0;padding:0 20px}
+  .stage{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:start}
+  @media(max-width:960px){.stage{grid-template-columns:1fr}}
+  .canvas-card{position:relative;border-radius:22px;overflow:hidden;border:1px solid var(--card-brd);background:linear-gradient(180deg,rgba(30,42,80,.35),rgba(14,20,42,.45));box-shadow:var(--shadow);height:min(70vh,600px);position:sticky;top:calc((100vh - min(70vh,600px)) / 2)}
+  @media(max-width:960px){.canvas-card{height:min(64vh,520px);position:relative;top:0}}
+  #scene{display:block;width:100%;height:100%}
+  .badge{position:absolute;left:16px;top:14px;z-index:3;font-size:12px;letter-spacing:.16em;color:var(--ink-faint);text-transform:uppercase;pointer-events:none}
+  .scene-tag{position:absolute;right:16px;top:14px;z-index:3;background:rgba(255,206,122,.16);border:1px solid rgba(255,206,122,.4);color:var(--gold-soft);padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600;backdrop-filter:blur(8px)}
+  .hint{position:absolute;left:16px;bottom:14px;z-index:3;font-size:12px;color:var(--ink-faint);pointer-events:none;max-width:60%}
+  .loading{position:absolute;inset:0;display:grid;place-items:center;z-index:5;color:var(--ink-dim);font-size:14px;letter-spacing:.1em;background:rgba(20,28,55,.5);transition:opacity .6s}
+  .playbar{position:absolute;right:16px;bottom:14px;z-index:4;display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--card-brd);border-radius:999px;padding:6px 12px;backdrop-filter:blur(10px)}
+  .playbar button{cursor:pointer;background:none;border:none;color:var(--ink);font-size:15px;padding:2px 4px}
+  .playbar input[type=range]{width:90px}
+
+  .panel{display:flex;flex-direction:column;gap:16px}
+  .card{background:var(--card);border:1px solid var(--card-brd);border-radius:18px;padding:20px 22px;backdrop-filter:blur(14px);box-shadow:var(--shadow)}
+  .card h3{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;margin-bottom:16px}
+  .card.hide{display:none}
+  .control{margin-bottom:20px}.control:last-child{margin-bottom:0}
+  .control .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .control .label{font-size:14px;color:var(--ink-dim)}
+  .control .val{font-family:var(--serif);font-size:18px;color:var(--gold-soft);font-weight:600;font-variant-numeric:tabular-nums}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:99px;background:linear-gradient(90deg,var(--blue),var(--cyan));outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:19px;height:19px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,var(--gold) 70%);border:2px solid rgba(255,255,255,.7);box-shadow:0 2px 10px rgba(255,206,122,.5)}
+  input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;border:2px solid #fff;background:var(--gold)}
+  .scale{display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--ink-faint)}
+  .presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .chip{font-size:12.5px;padding:6px 12px;border-radius:999px;cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink-dim);transition:.2s}
+  .chip:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .chip.active{background:rgba(255,206,122,.18);border-color:rgba(255,206,122,.55);color:var(--gold-soft)}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .metric{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  .metric .k{font-size:12px;color:var(--ink-faint);letter-spacing:.05em}
+  .metric .v{font-family:var(--serif);font-size:25px;font-weight:600;color:#fff;margin-top:4px;font-variant-numeric:tabular-nums}
+  .metric .v small{font-size:13px;color:var(--ink-dim);font-weight:400}
+  .metric.wide{grid-column:1/-1}
+  .daybar{height:12px;border-radius:99px;margin-top:10px;overflow:hidden;background:#0c1530;display:flex;border:1px solid var(--line)}
+  .daybar .day{background:linear-gradient(90deg,var(--gold),var(--gold-soft));height:100%}
+  .daybar .night{background:linear-gradient(90deg,#16224a,#0a1024);height:100%}
+  .polar-note{margin-top:12px;font-size:13px;color:var(--gold-soft);background:rgba(255,206,122,.10);border:1px solid rgba(255,206,122,.3);border-radius:10px;padding:8px 12px;display:none}
+  .polar-note.show{display:block}
+  .desc{font-size:13.5px;color:var(--ink-dim)}.desc b{color:var(--gold-soft);font-weight:600}
+  .planet-list{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+  .pl{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--ink-dim)}
+  .pl i{width:13px;height:13px;border-radius:50%;flex-shrink:0;box-shadow:0 0 8px rgba(255,255,255,.15)}
+  .pl b{color:var(--ink);font-weight:600;min-width:54px}
+  .pl span{margin-left:auto;color:var(--ink-faint);font-variant-numeric:tabular-nums}
+
+  .compare{max-width:1240px;margin:30px auto 0;padding:0 20px}
+  .compare.hide{display:none}
+  .compare h3{font-size:14px;color:var(--ink-dim);margin-bottom:8px}
+  .compare h3 b{color:var(--gold-soft)}
+  .cmp-row{display:flex;align-items:center;gap:14px;margin:11px 0}
+  .cmp-row .name{width:140px;flex-shrink:0;font-size:14px;color:var(--ink-dim)}
+  .cmp-row .name b{color:var(--ink);font-weight:600}
+  .cmp-track{flex:1;height:22px;border-radius:7px;overflow:hidden;display:flex;background:#0c1530;border:1px solid var(--line)}
+  .cmp-day{background:linear-gradient(90deg,#ffb24d,var(--gold-soft));height:100%;transition:width .5s ease}
+  .cmp-hours{width:96px;text-align:right;font-variant-numeric:tabular-nums;font-size:14px;color:var(--gold-soft);flex-shrink:0}
+  .cmp-legend{display:flex;gap:18px;font-size:12.5px;color:var(--ink-faint);margin-top:6px;flex-wrap:wrap}
+  .cmp-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
+  .explain{max-width:1100px;margin:50px auto 0;padding:0 24px}
+  .explain h2{font-family:var(--serif);font-size:clamp(22px,4vw,34px);font-weight:600;text-align:center;margin-bottom:10px;background:linear-gradient(180deg,#fff,#bfd2f5);-webkit-background-clip:text;background-clip:text;color:transparent}
+  html[lang="en"] .explain h2,html[lang="en"] .feat h4,html[lang="en"] .formula-card h3,html[lang="en"] .eq{font-family:Georgia,serif}
+  .explain .sub{text-align:center;color:var(--ink-dim);max-width:660px;margin:0 auto 34px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:820px){.grid3{grid-template-columns:1fr}}
+  .feat{background:var(--card);border:1px solid var(--card-brd);border-radius:18px;padding:26px 24px;backdrop-filter:blur(10px);transition:transform .3s,border-color .3s}
+  .feat:hover{transform:translateY(-4px);border-color:rgba(255,206,122,.4)}
+  .feat .ic{font-size:30px;margin-bottom:14px;display:block}
+  .feat h4{font-family:var(--serif);font-size:20px;font-weight:600;margin-bottom:10px;color:#fff}
+  .feat p{color:var(--ink-dim);font-size:14.5px}.feat .key{color:var(--gold-soft);font-weight:600}
+  .formula-card{max-width:1100px;margin:40px auto 0;padding:0 24px}
+  .formula-card .inner{background:linear-gradient(135deg,rgba(40,55,100,.4),rgba(16,24,48,.45));border:1px solid var(--card-brd);border-radius:18px;padding:30px 32px}
+  .formula-card h3{font-family:var(--serif);font-size:20px;margin-bottom:16px;color:#fff}
+  .eq{font-family:var(--serif);font-size:clamp(17px,2.6vw,23px);text-align:center;color:var(--gold-soft);padding:18px;background:rgba(0,0,0,.22);border-radius:12px;margin:14px 0;letter-spacing:.04em}
+  .formula-card p{color:var(--ink-dim);font-size:14.5px;margin-top:10px}
+  .formula-card code{font-family:var(--serif);color:var(--cyan);background:rgba(118,236,221,.12);padding:1px 7px;border-radius:6px}
+  footer{text-align:center;padding:54px 24px 40px;color:var(--ink-faint);font-size:13px;margin-top:56px;border-top:1px solid var(--line)}
+  footer b{color:var(--ink-dim)}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">EARTH · SUN · MOON · GALAXY</div>
+  <h1 data-i18n="title">地球、太阳与银河<br/>天体运动与日照模拟</h1>
+  <p class="lead" data-i18n="lead">选择模式，拨动时间，看天体如何运动、白昼如何变化。</p>
+</header>
+
+<nav class="modebar" id="modebar">
+  <button class="mode-btn active" data-mode="day"><span class="e">🌗</span><span data-i18n="m_day">日照 · 昼夜</span></button>
+  <button class="mode-btn" data-mode="moon"><span class="e">🌙</span><span data-i18n="m_moon">地月系统</span></button>
+  <button class="mode-btn" data-mode="orbit"><span class="e">🔄</span><span data-i18n="m_orbit">公转 · 四季 · 距离</span></button>
+  <button class="mode-btn" data-mode="solar"><span class="e">🪐</span><span data-i18n="m_solar">太阳系</span></button>
+  <button class="mode-btn" data-mode="galaxy"><span class="e">🌌</span><span data-i18n="m_galaxy">银河行进</span></button>
+  <div class="util">
+    <button id="langToggle">EN</button>
+    <button id="themeToggle">🌙 调暗</button>
+  </div>
+</nav>
+
+<section class="stage-wrap">
+  <div class="stage">
+    <div class="canvas-card">
+      <div class="badge" data-i18n="badge">交互式 3D · 拖动旋转 · 滚轮缩放</div>
+      <div class="scene-tag" id="sceneTag">—</div>
+      <canvas id="scene"></canvas>
+      <div class="hint" id="hint">🖱</div>
+      <div class="playbar"><button id="playBtn" title="play/pause">⏸</button><input type="range" id="speed" min="0" max="100" value="40" title="speed" /></div>
+      <div class="loading" id="loading" data-i18n="loading">正在加载天体…</div>
+    </div>
+
+    <div class="panel">
+      <div class="card" id="cardControls">
+        <h3 data-i18n="h_params">调节参数</h3>
+        <div class="control" id="ctlDate">
+          <div class="row"><span class="label" data-i18n="l_date">一年中的日期 · 季节</span><span class="val" id="dateVal">—</span></div>
+          <input type="range" id="dayOfYear" min="1" max="365" value="172" />
+          <div class="scale"><span data-i18n="mon1">1月</span><span data-i18n="mon4">4月</span><span data-i18n="mon7">7月</span><span data-i18n="mon10">10月</span><span data-i18n="mon12">12月</span></div>
+          <div class="presets" id="datePresets">
+            <span class="chip" data-day="79" data-i18n="p_spring">春分</span>
+            <span class="chip" data-day="172" data-i18n="p_summer">夏至</span>
+            <span class="chip" data-day="266" data-i18n="p_autumn">秋分</span>
+            <span class="chip" data-day="356" data-i18n="p_winter">冬至</span>
+          </div>
+        </div>
+        <div class="control" id="ctlTime">
+          <div class="row"><span class="label" data-i18n="l_time">当地时间（拖动转动地球）</span><span class="val" id="todVal">12:00</span></div>
+          <input type="range" id="timeOfDay" min="0" max="1439" value="720" />
+          <div class="scale"><span>0:00</span><span>6:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
+        </div>
+        <div class="control" id="ctlLat">
+          <div class="row"><span class="label" data-i18n="l_lat">观察者所在纬度</span><span class="val" id="latVal">40° N</span></div>
+          <input type="range" id="latitude" min="-90" max="90" value="40" />
+          <div class="scale"><span>90°S</span><span data-i18n="eq">赤道</span><span>90°N</span></div>
+          <div class="presets" id="latPresets">
+            <span class="chip" data-lat="0" data-i18n="p_eq">赤道 0°</span>
+            <span class="chip" data-lat="23.5" data-i18n="p_tropic">北回归线</span>
+            <span class="chip active" data-lat="40" data-i18n="p_bj">中纬 40°</span>
+            <span class="chip" data-lat="66.5" data-i18n="p_arctic">北极圈</span>
+            <span class="chip" data-lat="90" data-i18n="p_pole">北极点</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="cardDay">
+        <h3 data-i18n="h_dn">实时计算 · 昼夜</h3>
+        <div class="readout">
+          <div class="metric"><div class="k" data-i18n="k_decl">太阳直射纬度 δ</div><div class="v" id="declVal">+23.4°</div></div>
+          <div class="metric"><div class="k" data-i18n="k_alt">正午太阳高度</div><div class="v" id="altVal">73°</div></div>
+          <div class="metric wide"><div class="k" data-i18n="k_daylen">该纬度的白昼长度</div><div class="v" id="dayLenVal">—</div>
+            <div class="daybar"><div class="day" id="barDay" style="width:62%"></div><div class="night" id="barNight" style="width:38%"></div></div></div>
+          <div class="metric wide"><div class="k" data-i18n="k_time">观察点 · 当地真太阳时</div><div class="v" id="localTime">12:00</div><div class="k" id="sunRiseSet" style="margin-top:8px">—</div></div>
+        </div>
+        <div class="polar-note" id="polarNote"></div>
+        <p class="desc" data-i18n="d_dayarc" style="margin-top:12px">地球上的<b>金色弧线</b>=该纬线此刻处于<b>白昼</b>的部分，暗弧=黑夜。把日期拖到<b>夏至</b>再看：<b>纬度越高，金色弧占整圈越大</b>——所以自转一圈里高纬待在阳光下的时间更长，白昼更长；到北极圈以北整圈全金，就是<b>极昼</b>。</p>
+      </div>
+
+      <div class="card hide" id="cardClock">
+        <h3 data-i18n="h_clock">换算成钟表时间（近似）</h3>
+        <div class="presets" id="cityPresets" style="margin-bottom:14px">
+          <span class="chip" data-city="paris" data-i18n="c_paris">巴黎</span>
+          <span class="chip" data-city="beijing" data-i18n="c_beijing">北京</span>
+          <span class="chip" data-city="london" data-i18n="c_london">伦敦</span>
+          <span class="chip" data-city="ny" data-i18n="c_ny">纽约</span>
+          <span class="chip" data-city="tokyo" data-i18n="c_tokyo">东京</span>
+        </div>
+        <div class="control"><div class="row"><span class="label" data-i18n="l_lon">经度（东+ 西−）</span><span class="val" id="lonVal">0°</span></div><input type="range" id="lon" min="-180" max="180" value="0" /></div>
+        <div class="control"><div class="row"><span class="label" data-i18n="l_utc">时区 UTC</span><span class="val" id="utcVal">+0</span></div><input type="range" id="utc" min="-12" max="14" value="0" /></div>
+        <div class="row" style="margin-bottom:14px"><span class="label" data-i18n="l_dst">夏令时 +1h</span><span class="chip" id="dstBtn">关</span></div>
+        <div class="readout">
+          <div class="metric"><div class="k" data-i18n="k_clocknow">当前钟表时间</div><div class="v" id="clockNow">—</div></div>
+          <div class="metric"><div class="k" data-i18n="k_clockrs">日出 / 日落（钟表）</div><div class="v" id="clockRS" style="font-size:17px">—</div></div>
+        </div>
+        <p class="desc" data-i18n="d_clock" style="margin-top:10px">钟表时间 ≈ 真太阳时 + 时区 − 经度/15（+夏令时）。已忽略均时差（±15 分内）。</p>
+      </div>
+
+      <div class="card hide" id="cardOrbit">
+        <h3 data-i18n="h_orbit">实时计算 · 公转</h3>
+        <div class="readout">
+          <div class="metric"><div class="k" data-i18n="k_dist">日地距离</div><div class="v" id="distVal">—</div></div>
+          <div class="metric"><div class="k" data-i18n="k_distc">约合</div><div class="v" id="distKm">—</div></div>
+          <div class="metric wide"><div class="k" data-i18n="k_pos">当前节气 / 轨道位置</div><div class="v" id="orbitSeason">—</div></div>
+        </div>
+        <p class="desc" data-i18n="d_orbit" style="margin-top:14px">地球轨道是<b>椭圆</b>，太阳在一个焦点上。每年 <b>1月初（近日点）</b>最近、<b>7月初（远日点）</b>最远——但距离变化只有约 3%，<b>不是</b>四季的成因。真正决定季节的是<b>地轴 23.5° 的倾斜</b>。蓝色小月亮正绕地球公转。</p>
+      </div>
+
+      <div class="card hide" id="cardMoon">
+        <h3 data-i18n="h_moon">地月系统</h3>
+        <p class="desc" data-i18n="d_moon">月球距地球约 <b>38.4 万公里</b>，约 <b>27.3 天</b>绕地球一圈，且<b>同步自转</b>——所以永远以同一面朝向我们。它绕行时被太阳照亮的部分变化，就形成了我们看到的<b>月相</b>（新月→满月→新月）。</p>
+        <div class="readout" style="margin-top:16px">
+          <div class="metric"><div class="k" data-i18n="k_phase">当前月相</div><div class="v" id="phaseVal">—</div></div>
+          <div class="metric"><div class="k" data-i18n="k_age">月龄(约)</div><div class="v" id="moonAge">—</div></div>
+        </div>
+      </div>
+
+      <div class="card hide" id="cardSolar">
+        <h3 data-i18n="h_solar">太阳系 · 八大行星</h3>
+        <p class="desc" data-i18n="d_solar" style="margin-bottom:14px">行星离太阳越远，公转越慢（开普勒第三定律）。下方为相对公转周期，大小/距离为示意（非真实比例）。</p>
+        <div class="planet-list" id="planetList"></div>
+      </div>
+
+      <div class="card hide" id="cardGalaxy">
+        <h3 data-i18n="h_galaxy">银河中的太阳</h3>
+        <p class="desc" data-i18n="d_galaxy">太阳并非静止：它带着整个太阳系，以约 <b>每秒 220 公里</b>的速度绕<b>银河系中心</b>飞驰，约 <b>2.3 亿年</b>转一圈（一个"银河年"）。因为太阳在前进，行星绕日的同时，实际在太空中划出<b>螺旋状轨迹</b>——就像画面里的拖尾。</p>
+        <div class="readout" style="margin-top:16px">
+          <div class="metric"><div class="k" data-i18n="k_speed">绕银心速度</div><div class="v">220<small> km/s</small></div></div>
+          <div class="metric"><div class="k" data-i18n="k_galyr">银河年</div><div class="v" id="galYr">2.3<small> 亿年</small></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="explain">
+  <h2 data-i18n="ex_title">为什么不同纬度白昼不同？三句话</h2>
+  <p class="sub" data-i18n="ex_sub">不是离太阳远近，而是地球"歪着"转。</p>
+  <div class="grid3">
+    <div class="feat"><span class="ic">🌍</span><h4 data-i18n="f1t">① 地轴是倾斜的</h4><p data-i18n="f1p">自转轴倾斜 <span class="key">23.5°</span>，常年指向北极星，几乎不变。</p></div>
+    <div class="feat"><span class="ic">🔄</span><h4 data-i18n="f2t">② 直射点来回移动</h4><p data-i18n="f2p">公转使太阳<span class="key">直射点</span>在南北回归线之间往返：夏至直射北回归线，冬至直射南回归线。</p></div>
+    <div class="feat"><span class="ic">⏳</span><h4 data-i18n="f3t">③ 昼夜分界被切歪</h4><p data-i18n="f3p"><span class="key">纬度越高</span>，晨昏线切出的昼弧夜弧差距越大，直至极昼极夜。</p></div>
+  </div>
+</section>
+
+<section class="formula-card">
+  <div class="inner">
+    <h3 data-i18n="fm_title">背后的天文公式（本页实时计算）</h3>
+    <div class="eq">cos(H) = − tan(φ) · tan(δ)</div>
+    <p data-i18n="fm_p1"><code>φ</code>=纬度，<code>δ</code>=太阳直射纬度（赤纬），<code>H</code>=半个白昼的时角。</p>
+    <div class="eq">δ ≈ 23.44° · sin( 360°·(N+284)/365 )</div>
+    <p data-i18n="fm_p2"><code>N</code>=一年中的第几天，白昼时长 = (2H / 15°) 小时。当 <code>−tan(φ)·tan(δ)</code> 超出 [−1,1] 无解，即<b style="color:var(--gold-soft)">极昼或极夜</b>；赤道 φ=0 时白昼恒为 12 小时。</p>
+  </div>
+</section>
+
+<footer data-i18n="footer">用 <b>Three.js</b> + 天文公式构建 · 五种模式 · 中英双语 · 可部署到 <b>GitHub Pages</b> 🌐</footer>
+
+<script type="importmap">
+{ "imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+/* ===== i18n ===== */
+const I18N={
+ zh:{
+  title:'地球、太阳与银河<br/>天体运动与日照模拟',
+  lead:'选择模式，拨动时间，看天体如何运动、白昼如何变化。',
+  m_day:'日照 · 昼夜',m_moon:'地月系统',m_orbit:'公转 · 四季 · 距离',m_solar:'太阳系',m_galaxy:'银河行进',
+  badge:'交互式 3D · 拖动旋转 · 滚轮缩放',loading:'正在加载天体…',
+  h_params:'调节参数',l_date:'一年中的日期 · 季节',l_lat:'观察者所在纬度',eq:'赤道',
+  l_time:'当地时间（拖动转动地球）',p_spring:'春分',p_summer:'夏至',p_autumn:'秋分',p_winter:'冬至',
+  mon1:'1月',mon4:'4月',mon7:'7月',mon10:'10月',mon12:'12月',
+  p_eq:'赤道 0°',p_tropic:'北回归线',p_bj:'中纬 40°',p_arctic:'北极圈',p_pole:'北极点',
+  h_dn:'实时计算 · 昼夜',k_decl:'太阳直射纬度 δ',k_alt:'正午太阳高度',k_daylen:'该纬度的白昼长度',
+  d_dayarc:'地球上的<b>金色弧线</b>=该纬线此刻处于<b>白昼</b>的部分，暗弧=黑夜。把日期拖到<b>夏至</b>再看：<b>纬度越高，金色弧占整圈越大</b>——所以自转一圈里高纬待在阳光下的时间更长，白昼更长；到北极圈以北整圈全金，就是<b>极昼</b>。',
+  k_time:'观察点 · 当地真太阳时',sunrise:'日出',sunset:'日落',sunAllDay:'太阳整日不落（极昼）',sunNone:'太阳整日不升（极夜）',
+  h_clock:'换算成钟表时间（近似）',l_lon:'经度（东+ 西−）',l_utc:'时区 UTC',l_dst:'夏令时 +1h',k_clocknow:'当前钟表时间',k_clockrs:'日出 / 日落（钟表）',d_clock:'钟表时间 ≈ 真太阳时 + 时区 − 经度/15（+夏令时）。已忽略均时差（±15 分内）。',on:'开',off:'关',c_paris:'巴黎',c_beijing:'北京',c_london:'伦敦',c_ny:'纽约',c_tokyo:'东京',
+  h_orbit:'实时计算 · 公转',k_dist:'日地距离',k_distc:'约合',k_pos:'当前节气 / 轨道位置',
+  d_orbit:'地球轨道是<b>椭圆</b>，太阳在一个焦点上。每年 <b>1月初（近日点）</b>最近、<b>7月初（远日点）</b>最远——但距离变化只有约 3%，<b>不是</b>四季的成因。真正决定季节的是<b>地轴 23.5° 的倾斜</b>。蓝色小月亮正绕地球公转。',
+  h_moon:'地月系统',
+  d_moon:'月球距地球约 <b>38.4 万公里</b>，约 <b>27.3 天</b>绕地球一圈，且<b>同步自转</b>——所以永远以同一面朝向我们。它绕行时被太阳照亮的部分变化，就形成了我们看到的<b>月相</b>（新月→满月→新月）。',
+  k_phase:'当前月相',k_age:'月龄(约)',
+  h_solar:'太阳系 · 八大行星',d_solar:'行星离太阳越远，公转越慢（开普勒第三定律）。下方为相对公转周期，大小/距离为示意（非真实比例）。',
+  h_galaxy:'银河中的太阳',
+  d_galaxy:'太阳并非静止：它带着整个太阳系，以约 <b>每秒 220 公里</b>的速度绕<b>银河系中心</b>飞驰，约 <b>2.3 亿年</b>转一圈（一个"银河年"）。因为太阳在前进，行星绕日的同时，实际在太空中划出<b>螺旋状轨迹</b>——就像画面里的拖尾。',
+  k_speed:'绕银心速度',k_galyr:'银河年',galSunLabel:'☉ 太阳（我们在这里）',
+  cmp_title:'同一天，不同纬度的白昼长度对比',lg_day:'白昼时长',lg_night:'黑夜',lg_note:'越靠近两极，柱子随季节伸缩越剧烈',
+  ex_title:'为什么不同纬度白昼不同？三句话',ex_sub:'不是离太阳远近，而是地球"歪着"转。',
+  f1t:'① 地轴是倾斜的',f1p:'自转轴倾斜 <span class="key">23.5°</span>，常年指向北极星，几乎不变。',
+  f2t:'② 直射点来回移动',f2p:'公转使太阳<span class="key">直射点</span>在南北回归线之间往返：夏至直射北回归线，冬至直射南回归线。',
+  f3t:'③ 昼夜分界被切歪',f3p:'<span class="key">纬度越高</span>，晨昏线切出的昼弧夜弧差距越大，直至极昼极夜。',
+  fm_title:'背后的天文公式（本页实时计算）',
+  fm_p1:'<code>φ</code>=纬度，<code>δ</code>=太阳直射纬度（赤纬），<code>H</code>=半个白昼的时角。',
+  fm_p2:'<code>N</code>=一年中的第几天，白昼时长 = (2H / 15°) 小时。当 <code>−tan(φ)·tan(δ)</code> 超出 [−1,1] 无解，即<b style="color:var(--gold-soft)">极昼或极夜</b>；赤道 φ=0 时白昼恒为 12 小时。',
+  footer:'用 <b>Three.js</b> + 天文公式构建 · 五种模式 · 中英双语 · 可部署到 <b>GitHub Pages</b> 🌐',
+  // 动态
+  monthsShort:['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
+  dateFmt:(m,d)=>`${m}${d}日`,
+  units:{hr:' 时 ',min:' 分',au:' AU',km:' 亿km',day:' 天',galyr:' 亿年'},
+  seasons:{ss:'☀ 夏至前后',ws:'❄ 冬至前后',sp:'🌱 春分前后',au:'🍂 秋分前后',les:'🌤 暮春初夏',lsa:'🍃 盛夏入秋',dw:'🌨 隆冬向春',laa:'🌫 深秋入冬'},
+  seasonsPlain:{ss:'夏至前后',ws:'冬至前后',sp:'春分前后',au:'秋分前后',les:'暮春初夏',lsa:'盛夏入秋',dw:'隆冬向春',laa:'深秋入冬'},
+  tags:{day:'日照 · 昼夜',moon:'地月系统',orbit:'公转 · 四季 · 距离',solar:'太阳系',galaxy:'银河行进'},
+  hints:{day:'🖱 拖动旋转 · 金色弧=该纬线的白昼段',moon:'🖱 看月球绕地球 · 明暗即月相',orbit:'🖱 椭圆轨道 · 注意日地距离变化',solar:'🖱 行星各自绕日 · 滚轮缩放',galaxy:'🖱 太阳带行星绕银心 · 留意螺旋拖尾'},
+  planets:['水星','金星','地球','火星','木星','土星','天王星','海王星'],
+  period:(T)=> T<1? `周期 ${Math.round(T*12)} 月` : `周期 ${T} 年`,
+  cmp:['赤道','北回归线','中纬度','中高纬','北极圈','北极点'],
+  polarDay:'☀ 此地此时<b>极昼</b>：太阳整日不落。',polarNight:'🌑 此地此时<b>极夜</b>：太阳整日不升。',
+  cmpDay:'极昼 24h',cmpNight:'极夜 0h',
+  phases:['新月','娥眉月','上弦月','盈凸月','满月','亏凸月','下弦月','残月'],
+  latN:'N',latS:'S',eqLabel:'0° 赤道',
+  theme_light:'🌙 调暗',theme_dark:'🌗 调亮',langBtn:'EN'
+ },
+ en:{
+  title:'Earth, Sun &amp; Galaxy<br/>A Daylight &amp; Celestial Motion Simulator',
+  lead:'Pick a mode, scrub time, and watch how bodies move and daylight changes.',
+  m_day:'Daylight',m_moon:'Earth–Moon',m_orbit:'Orbit · Seasons · Distance',m_solar:'Solar System',m_galaxy:'Through the Galaxy',
+  badge:'Interactive 3D · drag to rotate · scroll to zoom',loading:'Loading celestial bodies…',
+  h_params:'Controls',l_date:'Day of year · season',l_lat:'Observer latitude',eq:'Equator',
+  l_time:'Local time (spin the Earth)',p_spring:'Mar equinox',p_summer:'June solstice',p_autumn:'Sep equinox',p_winter:'Dec solstice',
+  mon1:'Jan',mon4:'Apr',mon7:'Jul',mon10:'Oct',mon12:'Dec',
+  p_eq:'Equator 0°',p_tropic:'Tropic of Cancer',p_bj:'Mid-lat 40°',p_arctic:'Arctic Circle',p_pole:'North Pole',
+  h_dn:'Live · Day &amp; Night',k_decl:'Solar declination δ',k_alt:'Noon sun altitude',k_daylen:'Daylight length at this latitude',
+  d_dayarc:'The <b>golden arc</b> on the globe is the part of that latitude circle now in <b>daylight</b>; the dark arc is night. Drag the date to the <b>June solstice</b>: the <b>higher the latitude, the larger the golden fraction</b> — so in one rotation a high-latitude point stays sunlit longer, giving a longer day; north of the Arctic Circle the whole ring is golden — that is <b>polar day</b>.',
+  k_time:'Observer · local solar time',sunrise:'Sunrise',sunset:'Sunset',sunAllDay:'Sun never sets (polar day)',sunNone:'Sun never rises (polar night)',
+  h_clock:'Approximate clock time',l_lon:'Longitude (E+ / W−)',l_utc:'Time zone UTC',l_dst:'Daylight saving +1h',k_clocknow:'Current clock time',k_clockrs:'Sunrise / sunset (clock)',d_clock:'Clock time ≈ solar time + UTC − longitude/15 (+DST). Equation of time (±15 min) ignored.',on:'On',off:'Off',c_paris:'Paris',c_beijing:'Beijing',c_london:'London',c_ny:'New York',c_tokyo:'Tokyo',
+  h_orbit:'Live · Revolution',k_dist:'Earth–Sun distance',k_distc:'≈',k_pos:'Season / orbital position',
+  d_orbit:"Earth's orbit is an <b>ellipse</b> with the Sun at one focus. It is closest in <b>early January (perihelion)</b> and farthest in <b>early July (aphelion)</b> — but that is only ~3% and is <b>not</b> what causes the seasons. The seasons come from the <b>23.5° axial tilt</b>. The little blue Moon is orbiting Earth.",
+  h_moon:'The Earth–Moon system',
+  d_moon:'The Moon is about <b>384,000 km</b> away and circles Earth in roughly <b>27.3 days</b>. It is <b>tidally locked</b>, always showing us the same face. As it orbits, the sunlit fraction we see changes — that is the cycle of <b>lunar phases</b> (new → full → new).',
+  k_phase:'Current phase',k_age:'Moon age (approx)',
+  h_solar:'Solar System · 8 planets',d_solar:'The farther a planet, the slower it orbits (Kepler\'s third law). Below are relative orbital periods; sizes &amp; distances are schematic (not to scale).',
+  h_galaxy:'The Sun in the galaxy',
+  d_galaxy:'The Sun is not still: it carries the whole solar system around the <b>centre of the Milky Way</b> at about <b>220 km/s</b>, completing one lap in roughly <b>230 million years</b> (a "galactic year"). Because the Sun moves forward, the planets trace <b>helical paths</b> through space — like the trail you see.',
+  k_speed:'Orbital speed',k_galyr:'Galactic year',galSunLabel:'☉ Sun (we are here)',
+  cmp_title:'Same day — daylight length across latitudes',lg_day:'Daylight',lg_night:'Night',lg_note:'Closer to the poles, the bar swings more across seasons',
+  ex_title:'Why does daylight differ by latitude? In three lines',ex_sub:"Not distance to the Sun — it's that Earth spins tilted.",
+  f1t:'① The axis is tilted',f1p:'The spin axis is tilted <span class="key">23.5°</span> and points at the North Star year-round, almost unchanging.',
+  f2t:'② The subsolar point migrates',f2p:'Revolution swings the <span class="key">subsolar point</span> between the tropics: over the Tropic of Cancer at the June solstice, over Capricorn at the December solstice.',
+  f3t:'③ The day/night line gets skewed',f3p:'The <span class="key">higher the latitude</span>, the more unequal the day and night arcs cut by the terminator — up to polar day and polar night.',
+  fm_title:'The astronomy behind it (computed live here)',
+  fm_p1:'<code>φ</code> = latitude, <code>δ</code> = solar declination, <code>H</code> = the hour angle of half a day.',
+  fm_p2:'<code>N</code> = day of the year; daylight hours = (2H / 15°). When <code>−tan(φ)·tan(δ)</code> falls outside [−1,1] there is no solution — that is <b style="color:var(--gold-soft)">polar day or polar night</b>; at the equator (φ=0) daylight is always 12 h.',
+  footer:'Built with <b>Three.js</b> + astronomy · 5 modes · bilingual · deployable to <b>GitHub Pages</b> 🌐',
+  monthsShort:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+  dateFmt:(m,d)=>`${m} ${d}`,
+  units:{hr:' h ',min:' m',au:' AU',km:' ×10⁸km',day:' d',galyr:' Gyr'},
+  seasons:{ss:'☀ June solstice',ws:'❄ Dec solstice',sp:'🌱 March equinox',au:'🍂 Sept equinox',les:'🌤 late spring',lsa:'🍃 late summer',dw:'🌨 deep winter',laa:'🌫 late autumn'},
+  seasonsPlain:{ss:'June solstice',ws:'Dec solstice',sp:'March equinox',au:'Sept equinox',les:'late spring',lsa:'late summer',dw:'deep winter',laa:'late autumn'},
+  tags:{day:'Daylight',moon:'Earth–Moon',orbit:'Orbit · Seasons',solar:'Solar System',galaxy:'Through the Galaxy'},
+  hints:{day:'🖱 drag · golden arc = the daylight part of that latitude',moon:'🖱 watch the Moon orbit · light/dark = phase',orbit:'🖱 elliptical orbit · watch the distance change',solar:'🖱 planets orbit the Sun · scroll to zoom',galaxy:'🖱 Sun carries planets around the core · note the helix'},
+  planets:['Mercury','Venus','Earth','Mars','Jupiter','Saturn','Uranus','Neptune'],
+  period:(T)=> T<1? `period ${Math.round(T*12)} mo` : `period ${T} yr`,
+  cmp:['Equator','Tropic','Mid-lat','High-mid','Arctic Circle','North Pole'],
+  polarDay:'☀ <b>Polar day</b> here now: the Sun never sets.',polarNight:'🌑 <b>Polar night</b> here now: the Sun never rises.',
+  cmpDay:'Polar day 24h',cmpNight:'Polar night 0h',
+  phases:['New','Waxing crescent','First quarter','Waxing gibbous','Full','Waning gibbous','Last quarter','Waning crescent'],
+  latN:'N',latS:'S',eqLabel:'0° Equator',
+  theme_light:'🌙 Dark',theme_dark:'🌗 Light',langBtn:'中文'
+ }
+};
+
+/* ===== 天文计算 ===== */
+const EPS=23.44*Math.PI/180, deg=x=>x*180/Math.PI, rad=x=>x*Math.PI/180, TAU=Math.PI*2;
+const declination=N=>EPS*Math.sin(rad(360*(N+284)/365));
+function dayLength(phiDeg,N){const phi=rad(phiDeg),d=declination(N);let c=-Math.tan(phi)*Math.tan(d);if(c<=-1)return{hours:24,polar:'day',d};if(c>=1)return{hours:0,polar:'night',d};return{hours:2*deg(Math.acos(c))/15,polar:null,d};}
+const earthSunAU=N=>1.000001*(1-0.0167*Math.cos(rad(360*(N-4)/365)));
+function seasonKey(N){const d=deg(declination(N));if(d>23)return'ss';if(d<-23)return'ws';const rising=declination(N+5)>declination(N);if(Math.abs(d)<1.5)return rising?'sp':'au';return d>0?(rising?'les':'lsa'):(rising?'dw':'laa');}
+function dateLabel(N,L){const dt=new Date(2025,0,1);dt.setDate(N);return L.dateFmt(L.monthsShort[dt.getMonth()],dt.getDate());}
+function fmtHM(h){h=((h%24)+24)%24;let hh=Math.floor(h),mm=Math.round((h-hh)*60);if(mm===60){mm=0;hh=(hh+1)%24;}return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;}
+
+/* ===== 渲染基础 ===== */
+const canvas=document.getElementById('scene'),card=canvas.parentElement;
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(45,1,0.1,4000);camera.position.set(0,3,8);
+const controls=new OrbitControls(camera,canvas);controls.enableDamping=true;controls.dampingFactor=0.08;controls.enablePan=false;controls.enableZoom=false;controls.minDistance=3;controls.maxDistance=900;
+function resize(){const w=card.clientWidth,h=card.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+new ResizeObserver(resize).observe(card);
+scene.add(new THREE.AmbientLight(0x556088,0.9));
+function makeStars(n,rMin,rMax,size,color,op){const g=new THREE.BufferGeometry(),p=new Float32Array(n*3);let s=7;const rnd=()=>{s=(s*9301+49297)%233280;return s/233280;};for(let i=0;i<n;i++){const r=rMin+rnd()*(rMax-rMin),t=rnd()*TAU,ph=Math.acos(2*rnd()-1);p[i*3]=r*Math.sin(ph)*Math.cos(t);p[i*3+1]=r*Math.cos(ph);p[i*3+2]=r*Math.sin(ph)*Math.sin(t);}g.setAttribute('position',new THREE.BufferAttribute(p,3));return new THREE.Points(g,new THREE.PointsMaterial({color,size,sizeAttenuation:true,transparent:true,opacity:op}));}
+scene.add(makeStars(1600,120,900,1.2,0xbcd4ff,.85));
+const loader=new THREE.TextureLoader();loader.crossOrigin='anonymous';
+function tex(url,cb){return loader.load(url,t=>{t.colorSpace=THREE.SRGBColorSpace;cb&&cb(t);},undefined,()=>{});}
+const URL_EARTH='https://cdn.jsdelivr.net/npm/three-globe@2.31.0/example/img/earth-blue-marble.jpg';
+const URL_MOON='https://cdn.jsdelivr.net/npm/three-globe@2.31.0/example/img/moon_1024.jpg';
+function glowSphere(r,color,op){return new THREE.Mesh(new THREE.SphereGeometry(r,24,24),new THREE.MeshBasicMaterial({color,transparent:true,opacity:op}));}
+function orbitLine(r,color,op,seg=160,ecc=0){const pts=[],a=r,b=r*Math.sqrt(1-ecc*ecc),cx=-a*ecc;for(let i=0;i<=seg;i++){const t=i/seg*TAU;pts.push(new THREE.Vector3(cx+a*Math.cos(t),0,b*Math.sin(t)));}return new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color,transparent:true,opacity:op}));}
+function latRingGeo(latDeg,R){const phi=rad(latDeg),r=R*Math.cos(phi)*1.002,y=R*Math.sin(phi),pts=[];for(let i=0;i<=128;i++){const a=i/128*TAU;pts.push(new THREE.Vector3(r*Math.cos(a),y,r*Math.sin(a)));}return new THREE.BufferGeometry().setFromPoints(pts);}
+
+/* ===== 模式1 日照（太阳与地球同框，台灯+地球仪模型）===== */
+const gDay=new THREE.Group();scene.add(gDay);
+const SUNX=-7;                                  // 太阳固定在左侧
+const sunLight=new THREE.DirectionalLight(0xfff4dd,2.7);scene.add(sunLight);
+sunLight.position.set(SUNX,0,0);sunLight.target.position.set(0,0,0);scene.add(sunLight.target);
+const RD=2;
+const dSeason=new THREE.Group();gDay.add(dSeason);                 // 季节=地球绕日方位（绕Y）
+const dTilt=new THREE.Group();dTilt.rotation.z=EPS;dSeason.add(dTilt); // 固定 23.5° 倾角
+const dSpin=new THREE.Group();dTilt.add(dSpin);                    // 自转
+const dEarthMat=new THREE.MeshPhongMaterial({color:0x2a4a7a,shininess:8,specular:0x223344});
+dSpin.add(new THREE.Mesh(new THREE.SphereGeometry(RD,64,64),dEarthMat));
+tex(URL_EARTH,t=>{dEarthMat.map=t;dEarthMat.color.set(0xffffff);dEarthMat.needsUpdate=true;hideLoading();});
+const dAtmo=new THREE.Mesh(new THREE.SphereGeometry(RD*1.05,48,48),new THREE.ShaderMaterial({transparent:true,side:THREE.BackSide,blending:THREE.AdditiveBlending,vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:`varying vec3 vN;void main(){float i=pow(.62-dot(vN,vec3(0,0,1.)),2.2);gl_FragColor=vec4(.4,.65,1.,1.)*i;}`}));
+dSeason.add(dAtmo);
+dTilt.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,-RD*1.55,0),new THREE.Vector3(0,RD*1.55,0)]),new THREE.LineBasicMaterial({color:0xffce7a,transparent:true,opacity:.55})));
+const dMarker=new THREE.Mesh(new THREE.SphereGeometry(.085,16,16),new THREE.MeshBasicMaterial({color:0xffce7a}));dSpin.add(dMarker);
+// 昼夜弧：纬线固定在空间中（随季节、不随自转），金色=白昼弧、暗色=黑夜弧
+const dRings=new THREE.Group();dTilt.add(dRings);
+function buildColoredRing(lat,isSel){const geo=latRingGeo(lat,RD);const n=geo.attributes.position.count;geo.setAttribute('color',new THREE.Float32BufferAttribute(new Float32Array(n*3),3));const line=new THREE.Line(geo,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:isSel?1:.55}));line.userData={day:new THREE.Color(isSel?0xffd86a:0xe0a850),night:new THREE.Color(isSel?0x3a487c:0x1f2b4d)};return line;}
+[0,23.5,-23.5,66.5,-66.5].forEach(l=>dRings.add(buildColoredRing(l,false)));
+let dSelRing=buildColoredRing(40,true);dRings.add(dSelRing);
+const _rv=new THREE.Vector3();
+function colorRings(){const M=dTilt.matrixWorld;dRings.children.forEach(r=>{const pos=r.geometry.attributes.position,col=r.geometry.attributes.color,ud=r.userData;for(let i=0;i<pos.count;i++){_rv.fromBufferAttribute(pos,i).applyMatrix4(M);const c=_rv.x<0?ud.day:ud.night;col.setXYZ(i,c.r,c.g,c.b);}col.needsUpdate=true;});}
+// 太阳本体（固定左侧）
+const dSun=glowSphere(1.05,0xffe3a0,1);dSun.position.set(SUNX,0,0);dSun.add(glowSphere(1.9,0xffce7a,.22));dSun.add(glowSphere(3.0,0xffce7a,.08));gDay.add(dSun);
+const dSunDir=new THREE.Vector3(-1,0,0);            // 地球→太阳 方向（固定）
+// 平行阳光（示意光线照向地球受光面）
+(function rays(){const offs=[[0,0],[0,1.25],[0,-1.25],[1.25,0],[-1.25,0],[0.9,0.9],[-0.9,0.9],[0.9,-0.9],[-0.9,-0.9]];const seg=[];offs.forEach(([y,z])=>{const rr=y*y+z*z;if(rr>=3.9)return;const xs=-Math.sqrt(4-rr);seg.push(SUNX+1.4,y,z, xs,y,z);});const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(seg,3));gDay.add(new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:0xffce7a,transparent:true,opacity:.3,blending:THREE.AdditiveBlending})));})();
+function setDayLatRing(lat){dRings.remove(dSelRing);dSelRing.geometry.dispose();dSelRing=buildColoredRing(lat,true);dRings.add(dSelRing);const phi=rad(lat);dMarker.userData={r:RD*Math.cos(phi)*1.02,y:RD*Math.sin(phi)*1.02};}
+function dayUpdate(N){dSeason.rotation.y=rad(360*(N-172)/365);}   // 由日期决定季节方位→直射纬度（夏至北半球朝向太阳）
+// 观察点相对太阳的时角（弧度，0=正午），用于真太阳时
+function markerAng(){dMarker.getWorldPosition(_w);_axis.set(0,1,0).transformDirection(dTilt.matrixWorld).normalize();_mp.copy(_w).addScaledVector(_axis,-_w.dot(_axis));_sp.set(-1,0,0).addScaledVector(_axis,_axis.x);if(_mp.lengthSq()<1e-5||_sp.lengthSq()<1e-5)return null;_mp.normalize();_sp.normalize();return Math.atan2(_cr.crossVectors(_sp,_mp).dot(_axis),_sp.dot(_mp));}
+// 把地球自转到指定当地时间 T(小时)
+function setTimeOfDay(T){if(dMarker.userData.r===undefined)return;dMarker.position.set(dMarker.userData.r,dMarker.userData.y,0);dayUpdate(state.N);dSeason.updateMatrixWorld(true);const a0=markerAng();if(a0===null)return;let d=rad((T-12)*15)-a0;d=Math.atan2(Math.sin(d),Math.cos(d));dSpin.rotation.y+=d;dSeason.updateMatrixWorld(true);colorRings();$('localTime').textContent=fmtHM(T);$('todVal').textContent=fmtHM(T);}
+
+/* ===== 模式2 地月 ===== */
+const gMoon=new THREE.Group();scene.add(gMoon);
+const mLight=new THREE.DirectionalLight(0xfff2d6,2.2);gMoon.add(mLight);mLight.target.position.set(0,0,0);gMoon.add(mLight.target);mLight.position.set(20,2,6);
+const mEarthMat=new THREE.MeshPhongMaterial({color:0x2a4a7a,shininess:8});
+const mEarthGrp=new THREE.Group();mEarthGrp.rotation.z=EPS;gMoon.add(mEarthGrp);
+const mEarthSpin=new THREE.Group();mEarthGrp.add(mEarthSpin);
+mEarthSpin.add(new THREE.Mesh(new THREE.SphereGeometry(1.4,48,48),mEarthMat));
+tex(URL_EARTH,t=>{mEarthMat.map=t;mEarthMat.color.set(0xffffff);mEarthMat.needsUpdate=true;});
+const mMoonMat=new THREE.MeshPhongMaterial({color:0x8a8a8a,shininess:2});
+const mMoonPivot=new THREE.Group();gMoon.add(mMoonPivot);
+const mMoon=new THREE.Mesh(new THREE.SphereGeometry(.38,32,32),mMoonMat);mMoon.position.set(5.2,0,0);mMoonPivot.add(mMoon);
+tex(URL_MOON,t=>{mMoonMat.map=t;mMoonMat.color.set(0xffffff);mMoonMat.needsUpdate=true;});
+gMoon.add(orbitLine(5.2,0x9fb0e0,.25));
+const mSunGlow=glowSphere(2.4,0xffd98a,1);mSunGlow.position.set(34,4,10);mSunGlow.add(glowSphere(4,0xffce7a,.16));gMoon.add(mSunGlow);
+
+/* ===== 模式3 公转 ===== */
+const gOrbit=new THREE.Group();scene.add(gOrbit);
+const oSun=glowSphere(1.7,0xffd98a,1);oSun.add(glowSphere(3.2,0xffce7a,.18));gOrbit.add(oSun);
+const oPointLight=new THREE.PointLight(0xfff2d6,2,0);gOrbit.add(oPointLight);
+const ORB_A=12,ORB_E=0.25;
+gOrbit.add(orbitLine(ORB_A,0xa9c0ff,.4,200,ORB_E));
+const oEarthGrp=new THREE.Group();oEarthGrp.rotation.z=EPS;gOrbit.add(oEarthGrp);
+const oEarthMat=new THREE.MeshPhongMaterial({color:0x2a4a7a,shininess:8});
+const oSpin=new THREE.Group();oEarthGrp.add(oSpin);
+oSpin.add(new THREE.Mesh(new THREE.SphereGeometry(.85,48,48),oEarthMat));
+tex(URL_EARTH,t=>{oEarthMat.map=t;oEarthMat.color.set(0xffffff);oEarthMat.needsUpdate=true;});
+oEarthGrp.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,-1.5,0),new THREE.Vector3(0,1.5,0)]),new THREE.LineBasicMaterial({color:0xffce7a,transparent:true,opacity:.6})));
+const oMoonPivot=new THREE.Group();oEarthGrp.add(oMoonPivot);
+const oMoon=glowSphere(.22,0xcfd6e8,1);oMoon.position.set(1.7,0,0);oMoonPivot.add(oMoon);
+function ellipsePos(frac){const t=frac*TAU,a=ORB_A,b=ORB_A*Math.sqrt(1-ORB_E*ORB_E),cx=-a*ORB_E;return new THREE.Vector3(cx+a*Math.cos(t),0,b*Math.sin(t));}
+[['near',0,0xff9a5a],['far',0.5,0x7fb0ff]].forEach(([,f,c])=>{const m=glowSphere(.16,c,.9);m.position.copy(ellipsePos(f));gOrbit.add(m);});
+
+/* ===== 模式4 太阳系 ===== */
+const gSolar=new THREE.Group();scene.add(gSolar);
+const sSun=glowSphere(2.2,0xffd98a,1);sSun.add(glowSphere(3.6,0xffce7a,.2));gSolar.add(sSun);
+gSolar.add(new THREE.PointLight(0xfff4dd,2.2,0));
+const PLANETS=[{r:4.2,s:.16,c:0xb7b7b7,T:0.24},{r:5.6,s:.30,c:0xe0b072,T:0.62},{r:7.2,s:.32,c:0x4a90e2,T:1.0},{r:8.8,s:.24,c:0xd1502a,T:1.88},{r:11.6,s:.78,c:0xd2a679,T:11.9},{r:14.4,s:.66,c:0xe3cf97,T:29.5,ring:true},{r:16.8,s:.5,c:0x9fe3e8,T:84},{r:19,s:.48,c:0x4b6cff,T:165}];
+PLANETS.forEach((p,i)=>{gSolar.add(orbitLine(p.r,0x6f86c0,.25));const m=new THREE.Mesh(new THREE.SphereGeometry(p.s,32,32),new THREE.MeshStandardMaterial({color:p.c,roughness:.85,metalness:.1,emissive:new THREE.Color(p.c).multiplyScalar(.12)}));p.mesh=m;p.angle=i*0.8;gSolar.add(m);if(p.ring){const rg=new THREE.Mesh(new THREE.RingGeometry(p.s*1.4,p.s*2.1,48),new THREE.MeshBasicMaterial({color:0xe3cf97,side:THREE.DoubleSide,transparent:true,opacity:.5}));rg.rotation.x=Math.PI*0.46;m.add(rg);}});
+
+/* ===== 模式5 银河 ===== */
+const gGalaxy=new THREE.Group();scene.add(gGalaxy);
+(function spiral(){const arms=4,per=9000,g=new THREE.BufferGeometry(),pos=new Float32Array(per*3),col=new Float32Array(per*3);let s=99;const rnd=()=>{s=(s*9301+49297)%233280;return s/233280;};const c1=new THREE.Color(0xfff0c8),c2=new THREE.Color(0x6f9bff);for(let i=0;i<per;i++){const arm=i%arms,dist=Math.pow(rnd(),.6)*260+8,ang=dist*0.03+arm/arms*TAU+(rnd()-.5)*0.5;pos[i*3]=Math.cos(ang)*dist+(rnd()-.5)*14;pos[i*3+1]=(rnd()-.5)*14*(1-dist/400);pos[i*3+2]=Math.sin(ang)*dist+(rnd()-.5)*14;const cc=c1.clone().lerp(c2,Math.min(1,dist/260));col[i*3]=cc.r;col[i*3+1]=cc.g;col[i*3+2]=cc.b;}g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));gGalaxy.add(new THREE.Points(g,new THREE.PointsMaterial({size:1.4,vertexColors:true,transparent:true,opacity:.8,sizeAttenuation:true})));
+// 银心核球：加性辉光叠加，像真实星系中央隆起的恒星密集区
+const core=glowSphere(4,0xfff6e0,.6);core.material.blending=THREE.AdditiveBlending;gGalaxy.add(core);
+[[8,0xffe6b0,.28],[14,0xffce7a,.13],[22,0xffb866,.06]].forEach(([r,c,o])=>{const gg=glowSphere(r,c,o);gg.material.blending=THREE.AdditiveBlending;core.add(gg);});})();
+const galSys=new THREE.Group();gGalaxy.add(galSys);
+// 太阳：明亮的白黄恒星 + 日冕辉光（真实感）
+const galSun=glowSphere(1.7,0xfff4d6,1);galSys.add(galSun);
+[[2.8,0xffd98a,.5],[4.4,0xffce7a,.22],[6.5,0xffb84d,.1]].forEach(([r,c,o])=>{const gg=glowSphere(r,c,o);gg.material.blending=THREE.AdditiveBlending;galSun.add(gg);});
+// 「太阳（我们在这里）」标签
+const galLabelCanvas=document.createElement('canvas');galLabelCanvas.width=512;galLabelCanvas.height=96;
+const galLabelTex=new THREE.CanvasTexture(galLabelCanvas);
+const galLabel=new THREE.Sprite(new THREE.SpriteMaterial({map:galLabelTex,transparent:true,depthTest:false}));galLabel.scale.set(26,4.9,1);galLabel.position.set(0,5.5,0);galSun.add(galLabel);
+function setGalLabel(txt){const ctx=galLabelCanvas.getContext('2d');ctx.clearRect(0,0,512,96);ctx.font='bold 44px -apple-system,"PingFang SC",sans-serif';ctx.fillStyle='#ffe6b8';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,256,48);galLabelTex.needsUpdate=true;}
+const galPlanets=[{r:3.2,s:.22,c:0x4a90e2,sp:1},{r:4.4,s:.3,c:0xd2a679,sp:.5},{r:5.6,s:.2,c:0x4b6cff,sp:.3}];
+galPlanets.forEach(p=>{p.mesh=new THREE.Mesh(new THREE.SphereGeometry(p.s,16,16),new THREE.MeshStandardMaterial({color:p.c,emissive:new THREE.Color(p.c).multiplyScalar(.2)}));p.angle=0;galSys.add(p.mesh);});
+galSys.add(new THREE.PointLight(0xfff4dd,1.6,0));
+const GAL_R=150;
+const trailGeo=new THREE.BufferGeometry(),TRAIL=260,trailPos=new Float32Array(TRAIL*3);
+trailGeo.setAttribute('position',new THREE.BufferAttribute(trailPos,3));
+const trail=new THREE.Line(trailGeo,new THREE.LineBasicMaterial({color:0x9fd0ff,transparent:true,opacity:.4}));gGalaxy.add(trail);
+let trailIdx=0,trailFill=0;
+
+/* ===== 状态 & UI ===== */
+const $=id=>document.getElementById(id);
+const state={mode:'day',N:172,lat:40,playing:true,speed:0.4,gAng:0,lang:'zh',camTween:true,lon:0,utc:0,dst:false};
+const CITIES={paris:{lat:49,lon:2,utc:1,dst:true},beijing:{lat:40,lon:116,utc:8,dst:false},london:{lat:52,lon:0,utc:0,dst:true},ny:{lat:41,lon:-74,utc:-5,dst:true},tokyo:{lat:36,lon:140,utc:9,dst:false}};
+const toClock=solarH=>{let c=solarH+state.utc-state.lon/15+(state.dst?1:0);return((c%24)+24)%24;};
+const fmtLon=v=>v===0?'0°':(v>0?v+'°E':(-v)+'°W');
+const groups={day:gDay,moon:gMoon,orbit:gOrbit,solar:gSolar,galaxy:gGalaxy};
+const camPose={day:{pos:new THREE.Vector3(0,2.6,12),tar:new THREE.Vector3(-1.5,0,0)},moon:{pos:new THREE.Vector3(0,5,12),tar:new THREE.Vector3(0,0,0)},orbit:{pos:new THREE.Vector3(0,16,20),tar:new THREE.Vector3(0,0,0)},solar:{pos:new THREE.Vector3(0,22,30),tar:new THREE.Vector3(0,0,0)},galaxy:{pos:new THREE.Vector3(0,90,200),tar:new THREE.Vector3(0,0,0)}};
+let camDesired=new THREE.Vector3().copy(camPose.day.pos),camTarget=new THREE.Vector3().copy(camPose.day.tar);
+let zoomTarget=camPose.day.pos.distanceTo(camPose.day.tar),wheelAccum=0;
+canvas.addEventListener('wheel',e=>{e.preventDefault();wheelAccum+=(e.deltaY>0?1:-1);},{passive:false});
+const L=()=>I18N[state.lang];
+
+function showCards(){const m=state.mode;$('cardControls').classList.toggle('hide',!(m==='day'||m==='orbit'));$('ctlLat').style.display=m==='day'?'':'none';$('ctlTime').style.display=m==='day'?'':'none';$('ctlDate').style.display=(m==='day'||m==='orbit')?'':'none';$('cardDay').classList.toggle('hide',m!=='day');$('cardClock').classList.toggle('hide',m!=='day');$('cardOrbit').classList.toggle('hide',m!=='orbit');$('cardMoon').classList.toggle('hide',m!=='moon');$('cardSolar').classList.toggle('hide',m!=='solar');$('cardGalaxy').classList.toggle('hide',m!=='galaxy');}
+function setMode(m){state.mode=m;for(const k in groups)groups[k].visible=(k===m);sunLight.visible=(m==='day');mLight.visible=(m==='moon');camDesired.copy(camPose[m].pos);camTarget.copy(camPose[m].tar);state.camTween=true;zoomTarget=camPose[m].pos.distanceTo(camPose[m].tar);wheelAccum=0;document.querySelectorAll('.mode-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));controls.minDistance=m==='galaxy'?20:(m==='solar'||m==='orbit')?6:m==='day'?4.5:3;controls.maxDistance=m==='galaxy'?900:m==='day'?34:120;if(m==='day')setDayLatRing(state.lat);showCards();applyDynamic();refreshPanels();}
+
+function refreshPanels(){
+  const d=L(),N=state.N;
+  $('dateVal').textContent=dateLabel(N,d);
+  let latText=`${Math.abs(state.lat)}° ${state.lat>=0?d.latN:d.latS}`;if(+state.lat===0)latText=d.eqLabel;
+  $('latVal').textContent=latText;
+  const dl=dayLength(state.lat,N),dDeg=deg(dl.d);
+  $('declVal').textContent=(dDeg>=0?'+':'')+dDeg.toFixed(1)+'°';
+  const alt=90-Math.abs(state.lat-dDeg);$('altVal').textContent=(alt>0?alt.toFixed(0):'0')+'°';
+  const hh=Math.floor(dl.hours),mm=Math.round((dl.hours-hh)*60);
+  $('dayLenVal').innerHTML=`${hh}<small>${d.units.hr}</small>${String(mm).padStart(2,'0')}<small>${d.units.min}</small>`;
+  const pct=Math.max(0,Math.min(100,dl.hours/24*100));$('barDay').style.width=pct+'%';$('barNight').style.width=(100-pct)+'%';
+  const note=$('polarNote');if(dl.polar==='day'){note.className='polar-note show';note.innerHTML=d.polarDay;}else if(dl.polar==='night'){note.className='polar-note show';note.innerHTML=d.polarNight;}else note.className='polar-note';
+  const sr=$('sunRiseSet');if(dl.polar==='day')sr.textContent=d.sunAllDay;else if(dl.polar==='night')sr.textContent=d.sunNone;else sr.textContent=`${d.sunrise} ${fmtHM(12-dl.hours/2)} · ${d.sunset} ${fmtHM(12+dl.hours/2)}`;
+  $('lonVal').textContent=fmtLon(state.lon);$('utcVal').textContent=(state.utc>=0?'+':'')+state.utc;$('dstBtn').textContent=state.dst?d.on:d.off;$('dstBtn').classList.toggle('active',state.dst);
+  const crs=$('clockRS');if(dl.polar==='day')crs.textContent=d.sunAllDay;else if(dl.polar==='night')crs.textContent=d.sunNone;else crs.textContent=`${fmtHM(toClock(12-dl.hours/2))} · ${fmtHM(toClock(12+dl.hours/2))}`;
+  document.querySelectorAll('#cityPresets .chip').forEach(c=>{const o=CITIES[c.dataset.city];c.classList.toggle('active',!!o&&o.lon===state.lon&&o.utc===state.utc&&o.dst===state.dst);});
+  document.querySelectorAll('#latPresets .chip').forEach(c=>c.classList.toggle('active',Math.abs(+c.dataset.lat-state.lat)<0.6));
+  document.querySelectorAll('#datePresets .chip').forEach(c=>c.classList.toggle('active',Math.abs(+c.dataset.day-state.N)<3));
+  const au=earthSunAU(N);
+  $('distVal').innerHTML=au.toFixed(3)+`<small>${d.units.au}</small>`;
+  $('distKm').innerHTML=(au*1.496).toFixed(3)+`<small>${d.units.km}</small>`;
+  $('orbitSeason').textContent=d.seasonsPlain[seasonKey(N)];
+}
+function buildPlanetList(){const d=L(),box=$('planetList');box.innerHTML='';PLANETS.forEach((p,i)=>{box.insertAdjacentHTML('beforeend',`<div class="pl"><i style="background:#${p.c.toString(16).padStart(6,'0')}"></i><b>${d.planets[i]}</b><span>${d.period(p.T)}</span></div>`);});}
+function moonPhase(ang){const d=L(),a=((ang%TAU)+TAU)%TAU,x=a/TAU;let idx,age;if(x<0.03||x>0.97){idx=0;age=0;}else if(x<0.22){idx=1;age=Math.round(x*29.5);}else if(x<0.28){idx=2;age=7;}else if(x<0.47){idx=3;age=Math.round(x*29.5);}else if(x<0.53){idx=4;age=15;}else if(x<0.72){idx=5;age=Math.round(x*29.5);}else if(x<0.78){idx=6;age=22;}else{idx=7;age=Math.round(x*29.5);}return[d.phases[idx],age];}
+
+/* 动态文本（随语言/模式） */
+function applyDynamic(){const d=L();$('sceneTag').textContent=d.tags[state.mode];$('hint').textContent=d.hints[state.mode];$('galYr')&&($('galYr').innerHTML='2.3<small>'+d.units.galyr+'</small>');}
+function applyLang(){
+  const d=L();document.documentElement.setAttribute('lang',state.lang==='zh'?'zh-CN':'en');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(d[k]!=null)el.innerHTML=d[k];});
+  $('langToggle').textContent=d.langBtn;updateThemeBtn();setGalLabel(d.galSunLabel);
+  buildPlanetList();applyDynamic();refreshPanels();
+}
+function updateThemeBtn(){const deep=document.documentElement.getAttribute('data-theme')==='deep';$('themeToggle').textContent=deep?L().theme_dark:L().theme_light;}
+
+/* 事件 */
+$('dayOfYear').addEventListener('input',e=>{state.N=+e.target.value;refreshPanels();});
+$('latitude').addEventListener('input',e=>{state.lat=+e.target.value;setDayLatRing(state.lat);refreshPanels();});
+document.querySelectorAll('#latPresets .chip').forEach(c=>c.addEventListener('click',()=>{state.lat=+c.dataset.lat;$('latitude').value=state.lat;setDayLatRing(state.lat);refreshPanels();}));
+document.querySelectorAll('#datePresets .chip').forEach(c=>c.addEventListener('click',()=>{state.N=+c.dataset.day;$('dayOfYear').value=state.N;refreshPanels();}));
+$('timeOfDay').addEventListener('input',e=>{state.playing=false;$('playBtn').textContent='▶';setTimeOfDay(e.target.value/60);});
+$('lon').addEventListener('input',e=>{state.lon=+e.target.value;refreshPanels();});
+$('utc').addEventListener('input',e=>{state.utc=+e.target.value;refreshPanels();});
+$('dstBtn').addEventListener('click',()=>{state.dst=!state.dst;refreshPanels();});
+document.querySelectorAll('#cityPresets .chip').forEach(c=>c.addEventListener('click',()=>{const o=CITIES[c.dataset.city];state.lat=o.lat;state.lon=o.lon;state.utc=o.utc;state.dst=o.dst;$('latitude').value=o.lat;$('lon').value=o.lon;$('utc').value=o.utc;setDayLatRing(o.lat);refreshPanels();}));
+document.querySelectorAll('.mode-btn').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+$('playBtn').addEventListener('click',()=>{state.playing=!state.playing;$('playBtn').textContent=state.playing?'⏸':'▶';});
+$('speed').addEventListener('input',e=>{state.speed=e.target.value/100*1.4;});
+$('themeToggle').addEventListener('click',()=>{const h=document.documentElement,deep=h.getAttribute('data-theme')==='deep';h.setAttribute('data-theme',deep?'twilight':'deep');updateThemeBtn();});
+$('langToggle').addEventListener('click',()=>{state.lang=state.lang==='zh'?'en':'zh';applyLang();});
+
+/* 动画 */
+function hideLoading(){const l=$('loading');if(l){l.style.opacity=0;setTimeout(()=>l.remove(),600);}}
+setTimeout(()=>{if($('loading'))hideLoading();},4500);
+let t=0;const _w=new THREE.Vector3(),_axis=new THREE.Vector3(),_mp=new THREE.Vector3(),_sp=new THREE.Vector3(),_cr=new THREE.Vector3(),_zv=new THREE.Vector3();const dayCol=new THREE.Color(0xffce7a),nightCol=new THREE.Color(0x3b4a72);
+function animate(){
+  requestAnimationFrame(animate);
+  const sp=state.playing?state.speed:0,run=state.playing?1:0;t+=0.0025+sp*0.002;const m=state.mode;
+  if(m==='day'){dayUpdate(state.N);dSpin.rotation.y+=run*0.004+sp*0.02;dSeason.updateMatrixWorld(true);colorRings();if(dMarker.userData.r!==undefined){dMarker.position.set(dMarker.userData.r,dMarker.userData.y,0);dMarker.getWorldPosition(_w);const lit=_w.x<0;dMarker.material.color.copy(lit?dayCol:nightCol);_axis.set(0,1,0).transformDirection(dTilt.matrixWorld).normalize();_mp.copy(_w).addScaledVector(_axis,-_w.dot(_axis));_sp.set(-1,0,0).addScaledVector(_axis,_axis.x);if(_mp.lengthSq()>1e-5&&_sp.lengthSq()>1e-5){_mp.normalize();_sp.normalize();const ang=Math.atan2(_cr.crossVectors(_sp,_mp).dot(_axis),_sp.dot(_mp));const th=((12+deg(ang)/15)%24+24)%24;$('localTime').textContent=fmtHM(th);$('clockNow').textContent=fmtHM(toClock(th));if(state.playing){$('timeOfDay').value=Math.round(th*60);$('todVal').textContent=fmtHM(th);}}}}
+  else if(m==='moon'){mEarthSpin.rotation.y+=run*0.01+sp*0.02;mMoonPivot.rotation.y+=run*0.004+sp*0.03;mMoon.rotation.y=mMoonPivot.rotation.y;const[name,age]=moonPhase(mMoonPivot.rotation.y+Math.PI);$('phaseVal').textContent=name;$('moonAge').innerHTML=age+'<small>'+L().units.day+'</small>';}
+  else if(m==='orbit'){const frac=((state.N-4)/365)%1;oEarthGrp.position.copy(ellipsePos(frac));oSpin.rotation.y+=run*0.03+sp*0.05;oMoonPivot.rotation.y+=run*0.04+sp*0.06;if(state.playing){state.N+=sp*0.6;if(state.N>365)state.N-=364;$('dayOfYear').value=Math.round(state.N);refreshPanels();}}
+  else if(m==='solar'){PLANETS.forEach(p=>{p.angle+=(run*0.06+sp*0.18)/p.T;p.mesh.position.set(Math.cos(p.angle)*p.r,0,Math.sin(p.angle)*p.r);p.mesh.rotation.y+=run*0.02;});}
+  else if(m==='galaxy'){state.gAng+=run*0.0008+sp*0.0016;const cx=Math.cos(state.gAng)*GAL_R,cz=Math.sin(state.gAng)*GAL_R;galSys.position.set(cx,0,cz);galPlanets.forEach(p=>{p.angle+=(run*0.03+sp*0.08)*p.sp;p.mesh.position.set(Math.cos(p.angle)*p.r,0,Math.sin(p.angle)*p.r);});trailPos[trailIdx*3]=cx;trailPos[trailIdx*3+1]=0;trailPos[trailIdx*3+2]=cz;trailIdx=(trailIdx+1)%TRAIL;trailFill=Math.min(TRAIL,trailFill+1);trailGeo.setDrawRange(0,trailFill);trailGeo.attributes.position.needsUpdate=true;}
+  if(state.camTween){camera.position.lerp(camDesired,0.06);controls.target.lerp(camTarget,0.08);if(camera.position.distanceTo(camDesired)<0.2&&controls.target.distanceTo(camTarget)<0.12)state.camTween=false;}
+  else{ // 逐帧限速缩放：无视惯性事件数量，每帧最多缩放一点点
+    if(wheelAccum!==0){const k=Math.max(-3,Math.min(3,wheelAccum));zoomTarget=Math.min(controls.maxDistance,Math.max(controls.minDistance,zoomTarget*(1+k*0.012)));wheelAccum=0;}
+    const off=_zv.copy(camera.position).sub(controls.target);const cur=off.length();if(cur>1e-4){const nd=cur+(zoomTarget-cur)*0.18;camera.position.copy(controls.target).addScaledVector(off,nd/cur);}
+  }
+  controls.update();renderer.render(scene,camera);
+}
+resize();applyLang();setMode('day');animate();
+</script>
+</body>
+</html>
