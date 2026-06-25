@@ -352,7 +352,7 @@ const I18N={
   h_moon:'地月系统',
   d_moon:'月球距地球约 <b>38.4 万公里</b>，约 <b>27.3 天</b>绕地球一圈，且<b>同步自转</b>——所以永远以同一面朝向我们。它绕行时被太阳照亮的部分变化，就形成了我们看到的<b>月相</b>（新月→满月→新月）。',
   k_phase:'当前月相',k_age:'月龄(约)',
-  ecl_none:'正常',ecl_lunar:'月食',ecl_solar:'日食',
+  b_moon:'月球',ecl_none:'正常',ecl_lunar:'月食',ecl_solar:'日食',
   ecl_d_none:'月球正常绕地球运行，明暗变化即月相。点上面可演示日食 / 月食。',
   ecl_d_lunar:'<b>月食</b>：太阳—地球—月球成一线，<b>满月</b>时月球进入<b>地球的影子(本影锥)</b>，变暗并泛<b>古铜红</b>(阳光经地球大气折射偏红)。',
   ecl_d_solar:'<b>日食</b>：太阳—月球—地球成一线，<b>新月</b>时月球挡住太阳，在地球上投下一小片<b>本影</b>，影内可见日食。',
@@ -378,7 +378,7 @@ const I18N={
   tags:{day:'日照 · 昼夜',moon:'地月系统',orbit:'公转 · 四季 · 距离',solar:'太阳系',galaxy:'银河行进'},
   hints:{day:'🖱 拖动旋转 · 金色弧=该纬线的白昼段',moon:'🖱 看月球绕地球 · 明暗即月相',orbit:'🖱 椭圆轨道 · 注意日地距离变化',solar:'🖱 行星各自绕日 · 滚轮缩放',galaxy:'🖱 镜头跟随太阳 · 看它绕银心运动'},
   scaleNotes:{day:'⚠ 比例示意：太阳大小与日地距离非真实比例（真实太阳更大、更远）',moon:'⚠ 比例示意：月球大小与月地距离非真实比例（真实月地≈30个地球直径）',orbit:'⚠ 比例示意：轨道接近真实近圆；地球/太阳大小非真实比例',solar:'⚠ 比例示意：行星大小与轨道间距非真实比例',galaxy:'⚠ 比例示意：恒星数量/大小为象征；行星轨道与上下摆动幅度已放大'},
-  real_sch:'📐 真实比例',real_real:'📐 示意比例',scale_moon_real:'✔ 真实比例：月球在约 60 个地球半径外、直径仅地球的 1/4（拖动缩放观察）',scale_solar_real:'✔ 真实比例：大小与日距同尺度真实、太阳系极空旷。行星亮点仅为位置标记、非真实大小；太阳为真实大小',scale_real_na:'⚠ 该模式真实比例下天体过小/过远、无法有效显示，已保持示意',
+  real_sch:'📐 真实比例',real_real:'📐 示意比例',scale_moon_real:'✔ 真实比例：月球在约 60 个地球半径外、直径仅地球的 1/4（拖动缩放观察）',scale_solar_real:'✔ 真实比例：大小与日距同尺度真实、太阳系极空旷。行星亮点仅为位置标记、非真实大小；太阳为真实大小',scale_day_real:'✔ 真实比例：太阳居中、地球在 1 AU 处绕太阳公转（太小显示为亮点）。此模式不演示昼夜',scale_orbit_real:'✔ 真实比例：地球在 1 AU 处绕太阳；太小显示为亮点。太阳半径仅 1 AU 的 1/215',scale_galaxy_real:'✔ 真实比例：可见整个银河系；太阳系太小、仅显示为一个亮点',scale_real_na:'⚠ 该模式真实比例下天体过小/过远、无法有效显示，已保持示意',
   planets:['水星','金星','地球','火星','木星','土星','天王星','海王星'],
   period:(T)=> T<1? `周期 ${Math.round(T*12)} 月` : `周期 ${T} 年`,
   cmp:['赤道','北回归线','中纬度','中高纬','北极圈','北极点'],
@@ -406,7 +406,7 @@ const I18N={
   h_moon:'The Earth–Moon system',
   d_moon:'The Moon is about <b>384,000 km</b> away and circles Earth in roughly <b>27.3 days</b>. It is <b>tidally locked</b>, always showing us the same face. As it orbits, the sunlit fraction we see changes — that is the cycle of <b>lunar phases</b> (new → full → new).',
   k_phase:'Current phase',k_age:'Moon age (approx)',
-  ecl_none:'Normal',ecl_lunar:'Lunar eclipse',ecl_solar:'Solar eclipse',
+  b_moon:'Moon',ecl_none:'Normal',ecl_lunar:'Lunar eclipse',ecl_solar:'Solar eclipse',
   ecl_d_none:'The Moon orbits Earth normally; light/dark is its phase. Tap above to demo a solar / lunar eclipse.',
   ecl_d_lunar:'<b>Lunar eclipse</b>: Sun–Earth–Moon aligned; at <b>full moon</b> the Moon enters <b>Earth\'s shadow (umbra)</b> and dims to a <b>coppery red</b> (sunlight bent through Earth\'s atmosphere).',
   ecl_d_solar:'<b>Solar eclipse</b>: Sun–Moon–Earth aligned; at <b>new moon</b> the Moon blocks the Sun and casts a small <b>umbra</b> on Earth, where the eclipse is seen.',
@@ -431,7 +431,7 @@ const I18N={
   tags:{day:'Daylight',moon:'Earth–Moon',orbit:'Orbit · Seasons',solar:'Solar System',galaxy:'Through the Galaxy'},
   hints:{day:'🖱 drag · golden arc = the daylight part of that latitude',moon:'🖱 watch the Moon orbit · light/dark = phase',orbit:'🖱 elliptical orbit · watch the distance change',solar:'🖱 planets orbit the Sun · scroll to zoom',galaxy:'🖱 camera follows the Sun as it orbits the core'},
   scaleNotes:{day:'⚠ Schematic: Sun size & Earth–Sun distance not to scale (real Sun is far larger & farther)',moon:'⚠ Schematic: Moon size & distance not to scale (real distance ≈ 30 Earth diameters)',orbit:'⚠ Schematic: orbit near-real (almost circular); Earth/Sun sizes not to scale',solar:'⚠ Schematic: planet sizes & orbital spacing not to scale',galaxy:'⚠ Schematic: star count/size symbolic; planet orbits & vertical wobble exaggerated'},
-  real_sch:'📐 True scale',real_real:'📐 Schematic',scale_moon_real:'✔ True scale: the Moon is ~60 Earth-radii away and only ¼ of Earth\'s size (drag/zoom to explore)',scale_solar_real:'✔ True scale: sizes & distances on one real scale; space is mostly empty. Planet dots are position markers (not real size); the Sun is shown at real size',scale_real_na:'⚠ True scale not viewable here (bodies become tiny/too far); kept schematic',
+  real_sch:'📐 True scale',real_real:'📐 Schematic',scale_moon_real:'✔ True scale: the Moon is ~60 Earth-radii away and only ¼ of Earth\'s size (drag/zoom to explore)',scale_solar_real:'✔ True scale: sizes & distances on one real scale; space is mostly empty. Planet dots are position markers (not real size); the Sun is shown at real size',scale_day_real:'✔ True scale: Sun at center, Earth orbits at 1 AU (too small → a dot). Daylight demo off here',scale_orbit_real:'✔ True scale: Earth orbits at 1 AU; too small, shown as a dot. Sun radius is only 1/215 of 1 AU',scale_galaxy_real:'✔ True scale: the whole galaxy is in view; the solar system is too small — shown as a single dot',scale_real_na:'⚠ True scale not viewable here (bodies become tiny/too far); kept schematic',
   planets:['Mercury','Venus','Earth','Mars','Jupiter','Saturn','Uranus','Neptune'],
   period:(T)=> T<1? `period ${Math.round(T*12)} mo` : `period ${T} yr`,
   cmp:['Equator','Tropic','Mid-lat','High-mid','Arctic Circle','North Pole'],
@@ -507,7 +507,10 @@ function colorRings(){const M=dTilt.matrixWorld;dRings.children.forEach(r=>{cons
 const dSun=makeSun(1.05);dSun.position.set(SUNX,0,0);gDay.add(dSun);
 const dSunDir=new THREE.Vector3(-1,0,0);            // 地球→太阳 方向（固定）
 // 平行阳光（示意光线照向地球受光面）
-(function rays(){const offs=[[0,0],[0,1.25],[0,-1.25],[1.25,0],[-1.25,0],[0.9,0.9],[-0.9,0.9],[0.9,-0.9],[-0.9,-0.9]];const seg=[];offs.forEach(([y,z])=>{const rr=y*y+z*z;if(rr>=3.9)return;const xs=-Math.sqrt(4-rr);seg.push(SUNX+1.4,y,z, xs,y,z);});const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(seg,3));gDay.add(new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:0xffce7a,transparent:true,opacity:.3,blending:THREE.AdditiveBlending})));})();
+const dRays=(function rays(){const offs=[[0,0],[0,1.25],[0,-1.25],[1.25,0],[-1.25,0],[0.9,0.9],[-0.9,0.9],[0.9,-0.9],[-0.9,-0.9]];const seg=[];offs.forEach(([y,z])=>{const rr=y*y+z*z;if(rr>=3.9)return;const xs=-Math.sqrt(4-rr);seg.push(SUNX+1.4,y,z, xs,y,z);});const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(seg,3));return new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:0xffce7a,transparent:true,opacity:.3,blending:THREE.AdditiveBlending}));})();gDay.add(dRays);
+const dEarthDot=new THREE.Sprite(new THREE.SpriteMaterial({map:STAR_TEX,color:0x4a90e2,transparent:true,depthTest:false,sizeAttenuation:false}));dEarthDot.scale.set(0.018,0.018,1);dEarthDot.visible=false;gDay.add(dEarthDot);
+const dEarthLabel=makeLabelSprite(0.03);dEarthLabel.sprite.visible=false;gDay.add(dEarthLabel.sprite);
+const dDayOrbit=orbitLine(120,0xa9c0ff,.3,160);dDayOrbit.visible=false;gDay.add(dDayOrbit);
 function setDayLatRing(lat){dRings.remove(dSelRing);dSelRing.geometry.dispose();dSelRing=buildColoredRing(lat,true);dRings.add(dSelRing);const phi=rad(lat),lam=rad(state.lon),cf=Math.cos(phi),M=RD*1.02;dMarker.userData={x:M*Math.cos(lam)*cf,y:M*Math.sin(phi),z:-M*Math.sin(lam)*cf};}
 function dayUpdate(N){dSeason.rotation.y=rad(360*(N-172)/365);}   // 由日期决定季节方位→直射纬度（夏至北半球朝向太阳）
 // 观察点相对太阳的时角（弧度，0=正午），用于真太阳时
@@ -528,6 +531,8 @@ const mMoonPivot=new THREE.Group();gMoon.add(mMoonPivot);
 const mMoon=new THREE.Mesh(new THREE.SphereGeometry(.42,48,48),mMoonMat);mMoon.position.set(5.2,0,0);mMoonPivot.add(mMoon);
 tex(URL_MOON,t=>{mMoonMat.map=t;mMoonMat.bumpMap=t;mMoonMat.bumpScale=0.012;mMoonMat.color.set(0xffffff);mMoonMat.needsUpdate=true;});
 let mMoonOrbit=orbitLine(5.2,0x9fb0e0,.25);gMoon.add(mMoonOrbit);
+const mMoonLabel=makeLabelSprite(0.028);mMoonLabel.sprite.visible=false;gMoon.add(mMoonLabel.sprite);
+const mEarthLabel=makeLabelSprite(0.03);mEarthLabel.sprite.visible=false;mEarthLabel.sprite.position.set(0,2,0);gMoon.add(mEarthLabel.sprite);
 const mSunGlow=makeSun(2.4);mSunGlow.position.set(30,0,0);gMoon.add(mSunGlow);
 const mShadow=new THREE.Mesh(new THREE.ConeGeometry(1.42,16,40,1,true),new THREE.MeshBasicMaterial({color:0x04050d,transparent:true,opacity:.34,side:THREE.DoubleSide,depthWrite:false}));mShadow.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(-1,0,0));mShadow.position.set(-8,0,0);mShadow.visible=false;gMoon.add(mShadow);
 const mUmbra=new THREE.Mesh(new THREE.CircleGeometry(0.3,32),new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.55}));mUmbra.position.set(1.42,0,0);mUmbra.lookAt(10,0,0);mUmbra.visible=false;gMoon.add(mUmbra);
@@ -536,8 +541,8 @@ const mUmbra=new THREE.Mesh(new THREE.CircleGeometry(0.3,32),new THREE.MeshBasic
 const gOrbit=new THREE.Group();scene.add(gOrbit);
 const oSun=makeSun(1.7);gOrbit.add(oSun);
 const oPointLight=new THREE.PointLight(0xfff2d6,2,0);gOrbit.add(oPointLight);
-const ORB_A=12,ORB_E=0.04;
-gOrbit.add(orbitLine(ORB_A,0xa9c0ff,.4,200,ORB_E));
+let ORB_A=12;const ORB_E=0.04;
+let oOrbitLine=orbitLine(ORB_A,0xa9c0ff,.4,200,ORB_E);gOrbit.add(oOrbitLine);
 const oEarthGrp=new THREE.Group();oEarthGrp.rotation.z=EPS;gOrbit.add(oEarthGrp);
 const oEarthMat=new THREE.MeshPhongMaterial({color:0x2a4a7a,shininess:8});
 const oSpin=new THREE.Group();oEarthGrp.add(oSpin);
@@ -547,7 +552,9 @@ oEarthGrp.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE
 const oMoonPivot=new THREE.Group();oEarthGrp.add(oMoonPivot);
 const oMoon=glowSphere(.22,0xcfd6e8,1);oMoon.position.set(1.7,0,0);oMoonPivot.add(oMoon);
 function ellipsePos(frac){const t=frac*TAU,a=ORB_A,b=ORB_A*Math.sqrt(1-ORB_E*ORB_E),cx=-a*ORB_E;return new THREE.Vector3(cx+a*Math.cos(t),0,b*Math.sin(t));}
-[['near',0,0xff9a5a],['far',0.5,0x7fb0ff]].forEach(([,f,c])=>{const m=glowSphere(.16,c,.9);m.position.copy(ellipsePos(f));gOrbit.add(m);});
+const oMarks=[['near',0,0xff9a5a],['far',0.5,0x7fb0ff]].map(([,f,c])=>{const m=glowSphere(.16,c,.9);m.position.copy(ellipsePos(f));gOrbit.add(m);return {m,f};});
+const oEarthDot=new THREE.Sprite(new THREE.SpriteMaterial({map:STAR_TEX,color:0x4a90e2,transparent:true,depthTest:false,sizeAttenuation:false}));oEarthDot.scale.set(0.018,0.018,1);oEarthDot.visible=false;gOrbit.add(oEarthDot);
+const oEarthLabel=makeLabelSprite(0.03);oEarthLabel.sprite.visible=false;gOrbit.add(oEarthLabel.sprite);
 
 /* ===== 模式4 太阳系 ===== */
 const gSolar=new THREE.Group();scene.add(gSolar);
@@ -579,13 +586,14 @@ const gGalaxy=new THREE.Group();scene.add(gGalaxy);
 const galSys=new THREE.Group();galSys.rotation.x=1.05;gGalaxy.add(galSys);
 // 太阳：明亮的白黄恒星 + 日冕辉光（真实感）
 const galSun=makeSun(1.7);galSys.add(galSun);
+const galDot=new THREE.Sprite(new THREE.SpriteMaterial({map:STAR_TEX,color:0xffe6a0,transparent:true,depthTest:false,sizeAttenuation:false}));galDot.scale.set(0.02,0.02,1);galDot.visible=false;galSys.add(galDot);
 // 「太阳（我们在这里）」标签
 const galLabelCanvas=document.createElement('canvas');galLabelCanvas.width=512;galLabelCanvas.height=96;
 const galLabelTex=new THREE.CanvasTexture(galLabelCanvas);
-const galLabel=new THREE.Sprite(new THREE.SpriteMaterial({map:galLabelTex,transparent:true,depthTest:false,sizeAttenuation:false}));galLabel.scale.set(0.2,0.038,1);galLabel.position.set(0,3,0);galSun.add(galLabel);
+const galLabel=new THREE.Sprite(new THREE.SpriteMaterial({map:galLabelTex,transparent:true,depthTest:false,sizeAttenuation:false}));galLabel.scale.set(0.2,0.038,1);galLabel.position.set(0,3,0);galSys.add(galLabel);
 function setGalLabel(txt){const ctx=galLabelCanvas.getContext('2d');ctx.clearRect(0,0,512,96);ctx.font='bold 44px -apple-system,"PingFang SC",sans-serif';ctx.fillStyle='#ffe6b8';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,256,48);galLabelTex.needsUpdate=true;}
 const GP=[{r:2.0,s:.10,c:0xb7b7b7,T:0.24,tx:'mercurymap.jpg'},{r:2.7,s:.15,c:0xe0b072,T:0.62,tx:'venusmap.jpg'},{r:3.5,s:.16,c:0x4a90e2,T:1.0,tx:'earthmap1k.jpg'},{r:4.3,s:.13,c:0xd1502a,T:1.88,tx:'marsmap1k.jpg'},{r:5.7,s:.34,c:0xd2a679,T:11.9,tx:'jupitermap.jpg'},{r:7.0,s:.30,c:0xe3cf97,T:29.5,ring:true,tx:'saturnmap.jpg'},{r:8.1,s:.22,c:0x9fe3e8,T:84,tx:'uranusmap.jpg'},{r:9.1,s:.21,c:0x4b6cff,T:165,tx:'neptunemap.jpg'}];
-const galPlanets=GP.map((p,i)=>{galSys.add(orbitLine(p.r,0x6f86c0,.16));const mat=new THREE.MeshStandardMaterial({color:p.c,roughness:1,metalness:0});tex(PBASE+p.tx,t=>{mat.map=t;mat.color.set(0xffffff);mat.needsUpdate=true;});const m=new THREE.Mesh(new THREE.SphereGeometry(p.s,32,32),mat);m.rotation.z=0.4;galSys.add(m);if(p.ring){const rg=new THREE.Mesh(new THREE.RingGeometry(p.s*1.5,p.s*2.3,48),new THREE.MeshBasicMaterial({color:0xe3cf97,side:THREE.DoubleSide,transparent:true,opacity:.5}));rg.rotation.x=Math.PI*0.46;m.add(rg);}return {mesh:m,r:p.r,T:p.T,angle:i*0.7};});
+const galOrbits=[];const galPlanets=GP.map((p,i)=>{const gol=orbitLine(p.r,0x6f86c0,.16);galSys.add(gol);galOrbits.push(gol);const mat=new THREE.MeshStandardMaterial({color:p.c,roughness:1,metalness:0});tex(PBASE+p.tx,t=>{mat.map=t;mat.color.set(0xffffff);mat.needsUpdate=true;});const m=new THREE.Mesh(new THREE.SphereGeometry(p.s,32,32),mat);m.rotation.z=0.4;galSys.add(m);if(p.ring){const rg=new THREE.Mesh(new THREE.RingGeometry(p.s*1.5,p.s*2.3,48),new THREE.MeshBasicMaterial({color:0xe3cf97,side:THREE.DoubleSide,transparent:true,opacity:.5}));rg.rotation.x=Math.PI*0.46;m.add(rg);}return {mesh:m,r:p.r,T:p.T,angle:i*0.7};});
 galSys.add(new THREE.PointLight(0xfff4dd,2,0,0));
 const GAL_R=150;
 const trailGeo=new THREE.BufferGeometry(),TRAIL=520,trailPos=new Float32Array(TRAIL*3);
@@ -640,7 +648,7 @@ function applyDynamic(){const d=L();$('sceneTag').textContent=d.tags[state.mode]
 function applyLang(){
   const d=L();document.documentElement.setAttribute('lang',state.lang==='zh'?'zh-CN':'en');
   document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(d[k]!=null)el.innerHTML=d[k];});
-  $('langToggle').textContent=d.langBtn;updateThemeBtn();setGalLabel(d.galSunLabel);updatePlanetLabels();if($('eclDesc'))$('eclDesc').innerHTML=d['ecl_d_'+state.eclipse];$('realToggle').textContent=state.real?d.real_real:d.real_sch;updateScaleNote();
+  $('langToggle').textContent=d.langBtn;updateThemeBtn();setGalLabel(d.galSunLabel);updatePlanetLabels();drawLabelText(dEarthLabel,d.planets[2]);drawLabelText(oEarthLabel,d.planets[2]);drawLabelText(mEarthLabel,d.planets[2]);drawLabelText(mMoonLabel,d.b_moon);if($('eclDesc'))$('eclDesc').innerHTML=d['ecl_d_'+state.eclipse];$('realToggle').textContent=state.real?d.real_real:d.real_sch;updateScaleNote();
   buildPlanetList();applyDynamic();refreshPanels();
 }
 function updateThemeBtn(){const deep=document.documentElement.getAttribute('data-theme')==='deep';$('themeToggle').textContent=deep?L().theme_dark:L().theme_light;}
@@ -651,11 +659,14 @@ $('latitude').addEventListener('input',e=>{state.lat=+e.target.value;setDayLatRi
 document.querySelectorAll('#latPresets .chip').forEach(c=>c.addEventListener('click',()=>{state.lat=+c.dataset.lat;$('latitude').value=state.lat;setDayLatRing(state.lat);refreshPanels();if(state.mode==='day')setTimeOfDay(state.tod);}));
 document.querySelectorAll('#datePresets .chip').forEach(c=>c.addEventListener('click',()=>{state.N=+c.dataset.day;$('dayOfYear').value=state.N;refreshPanels();if(state.mode==='day')setTimeOfDay(state.tod);}));
 $('timeOfDay').addEventListener('input',e=>{state.playing=false;$('playBtn').textContent='▶';setTimeOfDay(e.target.value/60);});
-function setMoonScale(real){const r=real?84:5.2;mMoon.position.x=r;mMoon.scale.setScalar(real?0.9:1);gMoon.remove(mMoonOrbit);mMoonOrbit.geometry.dispose();mMoonOrbit=orbitLine(r,0x9fb0e0,real?.16:.25);gMoon.add(mMoonOrbit);}
-function updateScaleNote(){const d=L();if(state.real)$('scaleNote').textContent=state.mode==='moon'?d.scale_moon_real:(state.mode==='solar'?d.scale_solar_real:d.scale_real_na);else $('scaleNote').textContent=d.scaleNotes[state.mode];}
+function setMoonScale(real){const r=real?84:5.2;mMoon.position.x=r;mMoon.scale.setScalar(real?0.9:1);gMoon.remove(mMoonOrbit);mMoonOrbit.geometry.dispose();mMoonOrbit=orbitLine(r,0x9fb0e0,real?.16:.25);gMoon.add(mMoonOrbit);mSunGlow.visible=!real;}
+function updateScaleNote(){const d=L();if(state.real){const k={moon:'scale_moon_real',solar:'scale_solar_real',orbit:'scale_orbit_real',day:'scale_day_real',galaxy:'scale_galaxy_real'}[state.mode]||'scale_real_na';$('scaleNote').textContent=d[k];}else $('scaleNote').textContent=d.scaleNotes[state.mode];}
 function applyReal(){const d=L();$('realToggle').textContent=state.real?d.real_real:d.real_sch;setMoonScale(state.real);bgStars.visible=!state.real;camera.far=4000;
-  if(state.mode==='moon'){if(state.real){applyEclipse('none');camDesired.set(20,46,150);camTarget.set(42,0,0);}else{camDesired.copy(camPose.moon.pos);camTarget.copy(camPose.moon.tar);}state.camTween=true;zoomTarget=camDesired.distanceTo(camTarget);}
+  if(state.mode==='moon'){mMoonLabel.sprite.visible=state.real;mEarthLabel.sprite.visible=state.real;if(state.real){applyEclipse('none');camDesired.set(20,46,150);camTarget.set(42,0,0);controls.minDistance=5;controls.maxDistance=600;}else{camDesired.copy(camPose.moon.pos);camTarget.copy(camPose.moon.tar);controls.minDistance=3;controls.maxDistance=120;}state.camTween=true;zoomTarget=camDesired.distanceTo(camTarget);}
   if(state.mode==='solar'){PLANETS.forEach(p=>{p.ol.scale.setScalar(state.real?(p.au*AU)/p.r:1);p.mesh.scale.setScalar(state.real?(p.re*RE)/p.s:1);});sSun.scale.setScalar(state.real?(109.2*RE)/2.2:1);if(state.real){camera.far=24000;camDesired.set(0,1100,2000);camTarget.set(0,0,0);controls.maxDistance=14000;}else{camDesired.set(0,22,30);camTarget.set(0,0,0);controls.maxDistance=120;}state.camTween=true;zoomTarget=camDesired.distanceTo(camTarget);}
+  if(state.mode==='day'){dSeason.visible=!state.real;dRays.visible=!state.real;sunLight.visible=!state.real;dEarthDot.visible=state.real;dEarthLabel.sprite.visible=state.real;dDayOrbit.visible=state.real;if(state.real){dSun.position.set(0,0,0);dSun.scale.setScalar(0.53);camDesired.set(0,95,235);camTarget.set(0,0,0);controls.minDistance=4;controls.maxDistance=900;}else{dSun.position.set(SUNX,0,0);dSun.scale.setScalar(1);dEarthLabel.sprite.position.set(0,0,0);camDesired.copy(camPose.day.pos);camTarget.copy(camPose.day.tar);controls.minDistance=4.5;controls.maxDistance=34;}state.camTween=true;zoomTarget=camDesired.distanceTo(camTarget);}
+  if(state.mode==='orbit'){ORB_A=state.real?200:12;gOrbit.remove(oOrbitLine);oOrbitLine.geometry.dispose();oOrbitLine=orbitLine(ORB_A,0xa9c0ff,.4,240,ORB_E);gOrbit.add(oOrbitLine);oMarks.forEach(o=>{o.m.position.copy(ellipsePos(o.f));o.m.visible=!state.real;});oSun.scale.setScalar(state.real?(109.2*(200/23455))/1.7:1);oEarthGrp.visible=!state.real;oEarthDot.visible=state.real;oEarthLabel.sprite.visible=state.real;if(state.real){camDesired.set(0,150,360);camTarget.set(0,0,0);controls.minDistance=6;controls.maxDistance=2000;}else{camDesired.copy(camPose.orbit.pos);camTarget.copy(camPose.orbit.tar);controls.minDistance=6;controls.maxDistance=120;}state.camTween=true;zoomTarget=camDesired.distanceTo(camTarget);}
+  if(state.mode==='galaxy'){galDot.visible=state.real;galSun.visible=!state.real;galPlanets.forEach(p=>p.mesh.visible=!state.real);galOrbits.forEach(o=>o.visible=!state.real);if(state.real){camDesired.set(0,360,560);camTarget.set(0,0,0);controls.minDistance=60;controls.maxDistance=1400;}else{camDesired.copy(camPose.galaxy.pos);camTarget.copy(camPose.galaxy.tar);controls.minDistance=20;controls.maxDistance=900;}state.camTween=true;zoomTarget=camDesired.distanceTo(camTarget);}
   camera.updateProjectionMatrix();updateScaleNote();}
 $('realToggle').addEventListener('click',()=>{state.real=!state.real;applyReal();});
 function applyEclipse(e){state.eclipse=e;if(e!=='none'){state.playing=false;$('playBtn').textContent='▶';}
@@ -683,9 +694,10 @@ let t=0;const _w=new THREE.Vector3(),_axis=new THREE.Vector3(),_mp=new THREE.Vec
 function animate(){
   requestAnimationFrame(animate);
   const sp=state.playing?state.speed:0,run=state.playing?1:0;t+=0.0025+sp*0.002;const m=state.mode;
-  if(m==='day'){dayUpdate(state.N);dSpin.rotation.y+=run*0.004+sp*0.02;dSeason.updateMatrixWorld(true);colorRings();if(dMarker.userData.x!==undefined){dMarker.position.set(dMarker.userData.x,dMarker.userData.y,dMarker.userData.z);dMarker.getWorldPosition(_w);const lit=_w.x<0;dMarker.material.color.copy(lit?dayCol:nightCol);_axis.set(0,1,0).transformDirection(dTilt.matrixWorld).normalize();_mp.copy(_w).addScaledVector(_axis,-_w.dot(_axis));_sp.set(-1,0,0).addScaledVector(_axis,_axis.x);if(_mp.lengthSq()>1e-5&&_sp.lengthSq()>1e-5){_mp.normalize();_sp.normalize();const ang=Math.atan2(_cr.crossVectors(_sp,_mp).dot(_axis),_sp.dot(_mp));const th=((12+deg(ang)/15)%24+24)%24;$('localTime').textContent=fmtHM(th);$('clockNow').textContent=fmtHM(toClock(th));if(state.playing){state.tod=th;$('timeOfDay').value=Math.round(th*60);$('todVal').textContent=fmtHM(th);}}}}
-  else if(m==='moon'){mEarthSpin.rotation.y+=run*0.01+sp*0.02;mMoonPivot.rotation.y+=run*0.004+sp*0.03;const[name,age]=moonPhase(mMoonPivot.rotation.y);$('phaseVal').textContent=name;$('moonAge').innerHTML=age+'<small>'+L().units.day+'</small>';}
-  else if(m==='orbit'){const frac=((state.N-4)/365)%1;oEarthGrp.position.copy(ellipsePos(frac));oSpin.rotation.y+=run*0.03+sp*0.05;oMoonPivot.rotation.y+=run*0.04+sp*0.06;if(state.playing){state.N+=sp*0.6;if(state.N>365)state.N-=364;$('dayOfYear').value=Math.round(state.N);refreshPanels();}}
+  if(m==='day'&&state.real){const a=(((state.N-4)/365)%1)*TAU;dEarthDot.position.set(Math.cos(a)*120,0,Math.sin(a)*120);dEarthLabel.sprite.position.copy(dEarthDot.position);if(state.playing){state.N+=sp*0.6;if(state.N>365)state.N-=364;$('dayOfYear').value=Math.round(state.N);}}
+  else if(m==='day'){dayUpdate(state.N);dSpin.rotation.y+=run*0.004+sp*0.02;dSeason.updateMatrixWorld(true);colorRings();if(dMarker.userData.x!==undefined){dMarker.position.set(dMarker.userData.x,dMarker.userData.y,dMarker.userData.z);dMarker.getWorldPosition(_w);const lit=_w.x<0;dMarker.material.color.copy(lit?dayCol:nightCol);_axis.set(0,1,0).transformDirection(dTilt.matrixWorld).normalize();_mp.copy(_w).addScaledVector(_axis,-_w.dot(_axis));_sp.set(-1,0,0).addScaledVector(_axis,_axis.x);if(_mp.lengthSq()>1e-5&&_sp.lengthSq()>1e-5){_mp.normalize();_sp.normalize();const ang=Math.atan2(_cr.crossVectors(_sp,_mp).dot(_axis),_sp.dot(_mp));const th=((12+deg(ang)/15)%24+24)%24;$('localTime').textContent=fmtHM(th);$('clockNow').textContent=fmtHM(toClock(th));if(state.playing){state.tod=th;$('timeOfDay').value=Math.round(th*60);$('todVal').textContent=fmtHM(th);}}}}
+  else if(m==='moon'){mEarthSpin.rotation.y+=run*0.01+sp*0.02;mMoonPivot.rotation.y+=run*0.004+sp*0.03;if(state.real){mMoon.getWorldPosition(_w);mMoonLabel.sprite.position.copy(_w);}const[name,age]=moonPhase(mMoonPivot.rotation.y);$('phaseVal').textContent=name;$('moonAge').innerHTML=age+'<small>'+L().units.day+'</small>';}
+  else if(m==='orbit'){const frac=((state.N-4)/365)%1,pp=ellipsePos(frac);if(state.real){oEarthDot.position.copy(pp);oEarthLabel.sprite.position.copy(pp);}else{oEarthGrp.position.copy(pp);oSpin.rotation.y+=run*0.03+sp*0.05;oMoonPivot.rotation.y+=run*0.04+sp*0.06;}if(state.playing){state.N+=sp*0.6;if(state.N>365)state.N-=364;$('dayOfYear').value=Math.round(state.N);refreshPanels();}}
   else if(m==='solar'){PLANETS.forEach(p=>{p.angle+=(run*0.004+sp*0.06)/p.T;const R=state.real?p.au*AU:p.r,xo=Math.cos(p.angle)*R,zo=Math.sin(p.angle)*R,yy=-zo*Math.sin(p._inc),zt=zo*Math.cos(p._inc),x=xo*Math.cos(p._node)+zt*Math.sin(p._node),z=-xo*Math.sin(p._node)+zt*Math.cos(p._node);p.mesh.position.set(x,yy,z);p.mesh.rotation.y+=run*0.02;p.label.sprite.position.set(x,yy+(state.real?0:p.s+0.6),z);p.dot.position.set(x,yy,z);p.dot.visible=state.real;});}
   else if(m==='galaxy'){state.gAng+=run*0.0008+sp*0.0016;const cx=Math.cos(state.gAng)*GAL_R,cz=Math.sin(state.gAng)*GAL_R,cy=Math.sin(state.gAng*3.5)*2.6;galSys.position.set(cx,cy,cz);galPlanets.forEach(p=>{p.angle+=(run*0.012+sp*0.06)/p.T;p.mesh.position.set(Math.cos(p.angle)*p.r,0,Math.sin(p.angle)*p.r);});if(trailFill<TRAIL){trailPos[trailFill*3]=cx;trailPos[trailFill*3+1]=cy;trailPos[trailFill*3+2]=cz;trailFill++;}else{trailPos.copyWithin(0,3);trailPos[(TRAIL-1)*3]=cx;trailPos[(TRAIL-1)*3+1]=cy;trailPos[(TRAIL-1)*3+2]=cz;}trailGeo.setDrawRange(0,trailFill);trailGeo.attributes.position.needsUpdate=true;}
   if(state.camTween){camera.position.lerp(camDesired,0.06);controls.target.lerp(camTarget,0.08);if(camera.position.distanceTo(camDesired)<0.2&&controls.target.distanceTo(camTarget)<0.12)state.camTween=false;}
@@ -693,7 +705,7 @@ function animate(){
     if(wheelAccum!==0){const k=Math.max(-3,Math.min(3,wheelAccum));zoomTarget=Math.min(controls.maxDistance,Math.max(controls.minDistance,zoomTarget*(1+k*0.012)));wheelAccum=0;}
     const off=_zv.copy(camera.position).sub(controls.target);const cur=off.length();if(cur>1e-4){const nd=cur+(zoomTarget-cur)*0.18;camera.position.copy(controls.target).addScaledVector(off,nd/cur);}
   }
-  if(!state.camTween){let fp=null;if(m==='galaxy')fp=galSys.position;else if(m==='orbit')fp=oEarthGrp.position;else if(m==='moon'&&!state.real){mMoon.getWorldPosition(_w);fp=_w;}if(fp){const d=_zv.copy(fp).sub(controls.target).multiplyScalar(0.06);controls.target.add(d);camera.position.add(d);}}
+  if(!state.camTween){let fp=null;if(m==='galaxy'&&!state.real)fp=galSys.position;else if(m==='orbit')fp=state.real?oEarthDot.position:oEarthGrp.position;else if(m==='moon'&&!state.real){mMoon.getWorldPosition(_w);fp=_w;}if(fp){const d=_zv.copy(fp).sub(controls.target).multiplyScalar(0.06);controls.target.add(d);camera.position.add(d);}}
   controls.update();renderer.render(scene,camera);
 }
 resize();applyLang();setMode('day');animate();
