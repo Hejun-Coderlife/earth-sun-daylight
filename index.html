@@ -11,7 +11,7 @@
     --sans:"Noto Sans SC",-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;
   }
   html[data-theme="twilight"]{
-    --bg-grad:radial-gradient(1300px 820px at 50% -12%, rgba(72,48,140,.16), transparent 60%),radial-gradient(900px 700px at 88% 8%, rgba(40,90,180,.10), transparent 62%),linear-gradient(180deg,#040409,#070612 55%,#030308);
+    --bg-grad:radial-gradient(1200px 840px at 50% -14%, rgba(46,36,92,.5), transparent 62%),linear-gradient(160deg,#070614,#0a0820 50%,#040308);
     --ink:#f3f7ff; --ink-dim:#c4d2f0; --ink-faint:#8fa2cf;
     --card:rgba(56,74,128,.42); --card-brd:rgba(160,185,255,.30);
     --line:rgba(170,195,255,.22);
@@ -36,23 +36,21 @@
   ::selection{background:rgba(255,206,122,.3)}
   a{color:var(--gold-soft);text-decoration:none}
   /* 动态科幻星云背景 */
-  .bg-fx,.bg-fx2,.bg-fx3{position:fixed;inset:-25%;z-index:-1;pointer-events:none}
-  .bg-fx{background:
-      radial-gradient(38% 32% at 22% 28%, rgba(120,70,255,.22), transparent 62%),
-      radial-gradient(34% 30% at 78% 22%, rgba(40,130,255,.20), transparent 62%),
-      radial-gradient(42% 38% at 62% 82%, rgba(190,55,200,.16), transparent 62%);
-    filter:blur(34px);animation:neb 26s ease-in-out infinite alternate}
-  .bg-fx2{background:
-      radial-gradient(30% 26% at 50% 52%, rgba(70,200,220,.13), transparent 60%),
-      radial-gradient(28% 24% at 16% 76%, rgba(255,150,90,.10), transparent 60%);
-    filter:blur(44px);animation:neb2 36s ease-in-out infinite alternate}
-  .bg-fx3{background:repeating-linear-gradient(115deg, rgba(140,170,255,.04) 0 2px, transparent 2px 5px);opacity:.18;mix-blend-mode:screen;animation:scan 9s linear infinite}
-  .bg-stars{position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:radial-gradient(1.4px 1.4px at 40px 60px,rgba(255,255,255,.9),transparent),radial-gradient(1px 1px at 130px 170px,rgba(190,215,255,.8),transparent),radial-gradient(1px 1px at 250px 90px,rgba(255,255,255,.7),transparent),radial-gradient(1.6px 1.6px at 330px 250px,rgba(255,238,210,.85),transparent),radial-gradient(1px 1px at 90px 300px,rgba(255,255,255,.6),transparent),radial-gradient(1.2px 1.2px at 200px 330px,rgba(200,220,255,.7),transparent);background-size:380px 360px;animation:twinkle 5.5s ease-in-out infinite alternate;opacity:.7}
-  @keyframes twinkle{0%{opacity:.42}100%{opacity:.8}}
-  @keyframes neb{0%{transform:translate3d(-3%,-2%,0) scale(1) rotate(0deg)}100%{transform:translate3d(3%,3%,0) scale(1.16) rotate(7deg)}}
-  @keyframes neb2{0%{transform:translate3d(2%,1%,0) scale(1.12)}100%{transform:translate3d(-3%,-2%,0) scale(1)}}
-  @keyframes scan{0%{transform:translateY(-6%)}100%{transform:translateY(6%)}}
-  @media(prefers-reduced-motion:reduce){.bg-fx,.bg-fx2,.bg-fx3,.bg-stars{animation:none}}
+  .bg-neb,.bg-stars,.bg-stars2,.bg-grain,.bg-vignette{position:fixed;inset:0;z-index:-1;pointer-events:none}
+  .bg-neb{inset:-30%;mix-blend-mode:screen;will-change:transform}
+  .bg-neb1{background:radial-gradient(45% 40% at 28% 30%,rgba(122,72,235,.42),transparent 60%),radial-gradient(40% 38% at 76% 22%,rgba(58,120,255,.32),transparent 62%);filter:blur(60px);animation:neb 40s ease-in-out infinite alternate}
+  .bg-neb2{background:radial-gradient(46% 42% at 66% 78%,rgba(226,70,170,.30),transparent 60%),radial-gradient(38% 34% at 18% 80%,rgba(255,140,80,.16),transparent 62%);filter:blur(76px);animation:neb2 48s ease-in-out infinite alternate}
+  .bg-neb3{background:radial-gradient(34% 30% at 50% 46%,rgba(64,220,210,.20),transparent 62%),radial-gradient(30% 28% at 88% 60%,rgba(150,96,255,.22),transparent 62%);filter:blur(88px);opacity:.85;animation:neb 64s ease-in-out infinite alternate-reverse}
+  .bg-stars{background-image:radial-gradient(1.4px 1.4px at 40px 60px,rgba(255,255,255,.95),transparent),radial-gradient(1px 1px at 130px 170px,rgba(196,216,255,.85),transparent),radial-gradient(1.6px 1.6px at 330px 250px,rgba(255,238,212,.9),transparent),radial-gradient(1px 1px at 90px 300px,rgba(255,255,255,.6),transparent),radial-gradient(1.2px 1.2px at 200px 330px,rgba(206,222,255,.75),transparent);background-size:320px 300px;animation:twinkle 5s ease-in-out infinite alternate;opacity:.85}
+  .bg-stars2{background-image:radial-gradient(2.3px 2.3px at 120px 80px,rgba(255,255,255,.98),transparent),radial-gradient(2px 2px at 380px 300px,rgba(214,228,255,.9),transparent),radial-gradient(2.1px 2.1px at 520px 140px,rgba(255,246,224,.95),transparent),radial-gradient(1.9px 1.9px at 260px 460px,rgba(255,255,255,.85),transparent);background-size:600px 560px;animation:drift 90s linear infinite,twinkle2 7s ease-in-out infinite alternate;opacity:.9}
+  .bg-grain{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.05;mix-blend-mode:overlay}
+  .bg-vignette{background:radial-gradient(120% 120% at 50% 42%,transparent 55%,rgba(0,0,0,.55) 100%)}
+  @keyframes twinkle{0%{opacity:.55}100%{opacity:.95}}
+  @keyframes twinkle2{0%{opacity:.6}100%{opacity:1}}
+  @keyframes drift{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(-80px,50px,0)}}
+  @keyframes neb{0%{transform:translate3d(-2%,-2%,0) scale(1) rotate(0deg)}100%{transform:translate3d(3%,3%,0) scale(1.15) rotate(6deg)}}
+  @keyframes neb2{0%{transform:translate3d(2%,1%,0) scale(1.12) rotate(0deg)}100%{transform:translate3d(-3%,-2%,0) scale(1) rotate(-5deg)}}
+  @media(prefers-reduced-motion:reduce){.bg-neb,.bg-stars,.bg-stars2{animation:none}}
 
   header.hero{position:relative;padding:46px 24px 8px;text-align:center;max-width:1180px;margin:0 auto}
   .eyebrow{font-size:13px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);opacity:.9;margin-bottom:14px}
@@ -74,7 +72,7 @@
   .stage-wrap{max-width:1580px;margin:18px auto 0;padding:0 20px}
   .stage{display:grid;grid-template-columns:2.1fr 1fr;gap:20px;align-items:start}
   @media(max-width:960px){.stage{grid-template-columns:1fr}}
-  .canvas-card{position:relative;border-radius:22px;overflow:hidden;border:1px solid var(--card-brd);background:radial-gradient(130% 130% at 50% 35%, #0a0a0c, #020202);box-shadow:var(--shadow);height:min(82vh,720px)}
+  .canvas-card{position:relative;border-radius:22px;overflow:hidden;border:1px solid var(--card-brd);background:radial-gradient(130% 130% at 50% 35%, #0b0b10, #030305);box-shadow:var(--shadow),0 0 90px rgba(110,86,210,.16),0 0 30px rgba(60,110,200,.12);height:min(82vh,720px)}
   .left-col{position:sticky;top:calc((100vh - min(82vh,720px)) / 2 - 82px);align-self:start}
   @media(max-width:960px){.canvas-card{height:min(64vh,520px)}.left-col{position:static}}
   #scene{display:block;width:100%;height:100%}
@@ -166,10 +164,13 @@
   <p class="lead" data-i18n="lead">选择模式，拨动时间，看天体如何运动、白昼如何变化。</p>
 </header>
 
+<div class="bg-neb bg-neb1" aria-hidden="true"></div>
+<div class="bg-neb bg-neb2" aria-hidden="true"></div>
+<div class="bg-neb bg-neb3" aria-hidden="true"></div>
 <div class="bg-stars" aria-hidden="true"></div>
-<div class="bg-fx" aria-hidden="true"></div>
-<div class="bg-fx2" aria-hidden="true"></div>
-<div class="bg-fx3" aria-hidden="true"></div>
+<div class="bg-stars2" aria-hidden="true"></div>
+<div class="bg-grain" aria-hidden="true"></div>
+<div class="bg-vignette" aria-hidden="true"></div>
 
 <div class="util">
   <button id="realToggle">📐 真实比例</button>
@@ -472,9 +473,9 @@ function makeStars(n,rMin,rMax,size,color,op){const g=new THREE.BufferGeometry()
 const bgStars=makeStars(1600,120,900,1.2,0xbcd4ff,.85);scene.add(bgStars);
 const loader=new THREE.TextureLoader();loader.crossOrigin='anonymous';
 function tex(url,cb){return loader.load(url,t=>{t.colorSpace=THREE.SRGBColorSpace;cb&&cb(t);},undefined,()=>{});}
-const URL_EARTH='https://cdn.jsdelivr.net/npm/three-globe@2.31.0/example/img/earth-blue-marble.jpg';
-const URL_MOON='https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/moon_1024.jpg';
-const PBASE='https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/';
+const URL_EARTH='assets/earth-blue-marble.jpg';
+const URL_MOON='assets/moon_1024.jpg';
+const PBASE='assets/';
 function glowSphere(r,color,op){return new THREE.Mesh(new THREE.SphereGeometry(r,24,24),new THREE.MeshBasicMaterial({color,transparent:true,opacity:op}));}
 // 真实太阳：日面贴图(自发光) + 加性日冕辉光
 function makeSun(r){const g=new THREE.Group();const m=new THREE.MeshBasicMaterial({color:0xffe2a0});const core=new THREE.Mesh(new THREE.SphereGeometry(r,48,48),m);tex(PBASE+'sunmap.jpg',t=>{m.map=t;m.color.set(0xffffff);m.needsUpdate=true;});g.add(core);[[1.35,0xffd27a,.5],[1.95,0xffab4d,.22],[2.9,0xff7e2e,.08]].forEach(([k,c,o])=>{const gg=glowSphere(r*k,c,o);gg.material.blending=THREE.AdditiveBlending;g.add(gg);});return g;}
