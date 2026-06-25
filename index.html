@@ -84,6 +84,10 @@
   .loading{position:absolute;inset:0;display:grid;place-items:center;z-index:5;color:var(--ink-dim);font-size:14px;letter-spacing:.1em;background:rgba(20,28,55,.5);transition:opacity .6s}
   .playbar{position:absolute;right:16px;bottom:14px;z-index:4;display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--card-brd);border-radius:999px;padding:6px 12px;backdrop-filter:blur(10px)}
   .playbar button{cursor:pointer;background:none;border:none;color:var(--ink);font-size:15px;padding:2px 4px}
+  .playbar #fsBtn{font-size:12px;font-weight:600;border:1px solid var(--card-brd);border-radius:999px;padding:4px 11px;background:rgba(255,255,255,.07);white-space:nowrap}
+  .playbar #fsBtn:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .canvas-card:fullscreen{width:100vw;height:100vh;border-radius:0;border:none}
+  .canvas-card:-webkit-full-screen{width:100vw;height:100vh;border-radius:0;border:none}
   .playbar input[type=range]{width:90px}
 
   .panel{display:flex;flex-direction:column;gap:16px}
@@ -190,7 +194,7 @@
       <div class="scene-tag" id="sceneTag">—</div>
       <canvas id="scene"></canvas>
       <div class="hint" id="scaleNote" style="max-width:62%;color:var(--ink-faint)">⚠</div>
-      <div class="playbar"><button id="playBtn" title="play/pause">⏸</button><input type="range" id="speed" min="0" max="100" value="40" title="speed" /></div>
+      <div class="playbar"><button id="playBtn" title="play/pause">⏸</button><input type="range" id="speed" min="0" max="100" value="40" title="speed" /><button id="fsBtn" title="全屏">⛶ 全屏</button></div>
       <div class="loading" id="loading" data-i18n="loading">正在加载天体…</div>
     </div>
    </div>
@@ -355,7 +359,7 @@ const I18N={
   h_moon:'地月系统',
   d_moon:'月球距地球约 <b>38.4 万公里</b>，约 <b>27.3 天</b>绕地球一圈，且<b>同步自转</b>——所以永远以同一面朝向我们。它绕行时被太阳照亮的部分变化，就形成了我们看到的<b>月相</b>（新月→满月→新月）。',
   k_phase:'当前月相',k_age:'月龄(约)',
-  b_moon:'月球',b_sun:'太阳',ecl_none:'正常',ecl_lunar:'月食',ecl_solar:'日食',
+  b_moon:'月球',b_sun:'太阳',fs_enter:'⛶ 全屏',fs_exit:'🗗 退出全屏',ecl_none:'正常',ecl_lunar:'月食',ecl_solar:'日食',
   ecl_d_none:'月球正常绕地球运行，明暗变化即月相。点上面可演示日食 / 月食。',
   ecl_d_lunar:'<b>月食</b>：太阳—地球—月球成一线，<b>满月</b>时月球进入<b>地球的影子(本影锥)</b>，变暗并泛<b>古铜红</b>(阳光经地球大气折射偏红)。',
   ecl_d_solar:'<b>日食</b>：太阳—月球—地球成一线，<b>新月</b>时月球挡住太阳，在地球上投下一小片<b>本影</b>，影内可见日食。',
@@ -409,7 +413,7 @@ const I18N={
   h_moon:'The Earth–Moon system',
   d_moon:'The Moon is about <b>384,000 km</b> away and circles Earth in roughly <b>27.3 days</b>. It is <b>tidally locked</b>, always showing us the same face. As it orbits, the sunlit fraction we see changes — that is the cycle of <b>lunar phases</b> (new → full → new).',
   k_phase:'Current phase',k_age:'Moon age (approx)',
-  b_moon:'Moon',b_sun:'Sun',ecl_none:'Normal',ecl_lunar:'Lunar eclipse',ecl_solar:'Solar eclipse',
+  b_moon:'Moon',b_sun:'Sun',fs_enter:'⛶ Fullscreen',fs_exit:'🗗 Exit',ecl_none:'Normal',ecl_lunar:'Lunar eclipse',ecl_solar:'Solar eclipse',
   ecl_d_none:'The Moon orbits Earth normally; light/dark is its phase. Tap above to demo a solar / lunar eclipse.',
   ecl_d_lunar:'<b>Lunar eclipse</b>: Sun–Earth–Moon aligned; at <b>full moon</b> the Moon enters <b>Earth\'s shadow (umbra)</b> and dims to a <b>coppery red</b> (sunlight bent through Earth\'s atmosphere).',
   ecl_d_solar:'<b>Solar eclipse</b>: Sun–Moon–Earth aligned; at <b>new moon</b> the Moon blocks the Sun and casts a small <b>umbra</b> on Earth, where the eclipse is seen.',
@@ -659,7 +663,7 @@ function applyDynamic(){const d=L();$('sceneTag').textContent=d.tags[state.mode]
 function applyLang(){
   const d=L();document.documentElement.setAttribute('lang',state.lang==='zh'?'zh-CN':'en');
   document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(d[k]!=null)el.innerHTML=d[k];});
-  $('langToggle').textContent=d.langBtn;updateThemeBtn();setGalLabel(d.galSunLabel);updatePlanetLabels();drawLabelText(dEarthLabel,d.planets[2]);drawLabelText(oEarthLabel,d.planets[2]);drawLabelText(mEarthLabel,d.planets[2]);drawLabelText(mMoonLabel,d.b_moon);drawLabelText(dSunLabel,d.b_sun);drawLabelText(oSunLabel,d.b_sun);if($('eclDesc'))$('eclDesc').innerHTML=d['ecl_d_'+state.eclipse];$('realToggle').textContent=state.real?d.real_real:d.real_sch;updateScaleNote();
+  $('langToggle').textContent=d.langBtn;updateThemeBtn();setGalLabel(d.galSunLabel);updatePlanetLabels();drawLabelText(dEarthLabel,d.planets[2]);drawLabelText(oEarthLabel,d.planets[2]);drawLabelText(mEarthLabel,d.planets[2]);drawLabelText(mMoonLabel,d.b_moon);drawLabelText(dSunLabel,d.b_sun);drawLabelText(oSunLabel,d.b_sun);if($('eclDesc'))$('eclDesc').innerHTML=d['ecl_d_'+state.eclipse];$('realToggle').textContent=state.real?d.real_real:d.real_sch;updateScaleNote();updateFsBtn();
   buildPlanetList();applyDynamic();refreshPanels();
 }
 function updateThemeBtn(){const deep=document.documentElement.getAttribute('data-theme')==='deep';$('themeToggle').textContent=deep?L().theme_dark:L().theme_light;}
@@ -694,6 +698,10 @@ $('dstBtn').addEventListener('click',()=>{state.dst=!state.dst;refreshPanels();}
 document.querySelectorAll('#cityPresets .chip').forEach(c=>c.addEventListener('click',()=>{const o=CITIES[c.dataset.city];state.lat=o.lat;state.lon=o.lon;state.utc=o.utc;state.dst=o.dst;$('latitude').value=o.lat;$('lon').value=o.lon;$('utc').value=o.utc;setDayLatRing(o.lat);refreshPanels();if(state.mode==='day')setTimeOfDay(state.tod);}));
 document.querySelectorAll('.mode-btn').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
 $('playBtn').addEventListener('click',()=>{state.playing=!state.playing;$('playBtn').textContent=state.playing?'⏸':'▶';if(state.playing&&state.eclipse!=='none')applyEclipse('none');});
+function updateFsBtn(){const fs=document.fullscreenElement||document.webkitFullscreenElement;$('fsBtn').textContent=fs?L().fs_exit:L().fs_enter;}
+$('fsBtn').addEventListener('click',()=>{if(!(document.fullscreenElement||document.webkitFullscreenElement)){(card.requestFullscreen||card.webkitRequestFullscreen||(()=>{})).call(card);}else{(document.exitFullscreen||document.webkitExitFullscreen||(()=>{})).call(document);}});
+document.addEventListener('fullscreenchange',()=>{updateFsBtn();setTimeout(resize,60);});
+document.addEventListener('webkitfullscreenchange',()=>{updateFsBtn();setTimeout(resize,60);});
 $('speed').addEventListener('input',e=>{state.speed=e.target.value/100*1.4;});
 $('themeToggle').addEventListener('click',()=>{const h=document.documentElement,deep=h.getAttribute('data-theme')==='deep';h.setAttribute('data-theme',deep?'twilight':'deep');updateThemeBtn();});
 $('langToggle').addEventListener('click',()=>{state.lang=state.lang==='zh'?'en':'zh';applyLang();});
