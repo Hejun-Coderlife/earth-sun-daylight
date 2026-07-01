@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>地球 · 太阳 · 银河 — 日照与天体运动模拟</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='2' y='2' width='28' height='28' rx='8' fill='%230e1a3c'/><circle cx='16' cy='16' r='8.5' fill='%232f6f9e'/><path d='M16 7.5a8.5 8.5 0 0 1 0 17z' fill='%23f2c14e'/><circle cx='16' cy='16' r='8.5' fill='none' stroke='%237fc5e6' stroke-width='0.7' opacity='.55'/><circle cx='25' cy='7' r='1' fill='%23fff'/><circle cx='7' cy='25' r='.7' fill='%23fff' opacity='.8'/></svg>">
+
 <meta name="description" content="可交互的太阳系/地月模拟：昼夜、四季、公转椭圆、日地距离、八大行星、月球、银河行进。中英双语。" />
 <style>
   :root{
@@ -61,7 +63,8 @@
   .modebar{margin:0 0 14px}
   .modebar-inner{padding:0;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center}
   .mode-btn{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:600;padding:10px 18px;border-radius:999px;border:1px solid var(--card-brd);background:var(--card);color:var(--ink-dim);backdrop-filter:blur(10px);transition:.22s}
-  .mode-btn .e{font-size:17px}
+  .mode-btn .e{display:inline-flex;align-items:center}
+  .mode-btn .e svg{width:17px;height:17px;display:block}
   .mode-btn:hover{color:var(--ink);border-color:var(--gold);transform:translateY(-2px)}
   .mode-btn.active{background:linear-gradient(135deg,rgba(255,206,122,.28),rgba(120,160,255,.22));border-color:rgba(255,206,122,.6);color:#fff;box-shadow:0 6px 22px rgba(255,206,122,.18)}
   .util{position:fixed;top:14px;right:20px;z-index:50;display:flex;gap:8px}
@@ -72,6 +75,9 @@
   .real-toggle{cursor:pointer;font-size:13.5px;font-weight:800;padding:9px 14px;border-radius:999px;color:#1a1205;border:1px solid rgba(255,206,122,.9);background:linear-gradient(135deg,var(--gold) 0%,var(--gold-soft) 100%);box-shadow:0 4px 16px rgba(255,180,90,.34),0 0 0 0 rgba(255,206,122,.55);animation:realPulse 2.4s ease-in-out infinite;transition:.2s}
   .real-toggle:hover{color:#1a1205;border-color:#fff;filter:brightness(1.06)}
   .real-toggle.on{animation:none;color:var(--gold-soft);background:rgba(255,206,122,.14);border-color:var(--gold);box-shadow:inset 0 0 0 1px rgba(255,206,122,.5),0 0 14px rgba(255,180,90,.3)}
+  .real-toggle::before,#themeToggle::before{content:'';display:inline-block;width:15px;height:15px;margin-right:6px;vertical-align:-3px;background:currentColor;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:contain;mask-size:contain}
+  .real-toggle::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9 9 3 21 15 15 21Z'/%3E%3Cpath d='M8 8l1.6 1.6M11.5 11.5l1.6 1.6M15 15l1.6 1.6'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9 9 3 21 15 15 21Z'/%3E%3Cpath d='M8 8l1.6 1.6M11.5 11.5l1.6 1.6M15 15l1.6 1.6'/%3E%3C/svg%3E")}
+  #themeToggle::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20 13.6A7.5 7.5 0 1 1 10.9 4.3 6 6 0 0 0 20 13.6Z' fill='black'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20 13.6A7.5 7.5 0 1 1 10.9 4.3 6 6 0 0 0 20 13.6Z' fill='black'/%3E%3C/svg%3E")}
   @keyframes realPulse{0%,100%{box-shadow:0 4px 16px rgba(255,180,90,.34),0 0 0 0 rgba(255,206,122,.55)}50%{box-shadow:0 4px 16px rgba(255,180,90,.34),0 0 0 9px rgba(255,206,122,0)}}
   @media(prefers-reduced-motion:reduce){.real-toggle{animation:none}}
   /* 全屏内悬浮工具条：仅全屏时显示（普通视图用外部 modebar + util，不受影响） */
@@ -187,7 +193,7 @@
 
 <div class="util">
   <button id="langToggle">EN</button>
-  <button id="themeToggle">🌙 调暗</button>
+  <button id="themeToggle">调暗</button>
 </div>
 
 <section class="stage-wrap">
@@ -195,22 +201,22 @@
    <div class="left-col">
     <nav class="modebar" id="modebar">
      <div class="modebar-inner">
-      <button class="mode-btn active" data-mode="day"><span class="e">🌗</span><span data-i18n="m_day">日照 · 昼夜</span></button>
-      <button class="mode-btn" data-mode="moon"><span class="e">🌙</span><span data-i18n="m_moon">地月系统</span></button>
-      <button class="mode-btn" data-mode="orbit"><span class="e">🔄</span><span data-i18n="m_orbit">公转</span></button>
-      <button class="mode-btn" data-mode="solar"><span class="e">🪐</span><span data-i18n="m_solar">太阳系</span></button>
-      <button class="mode-btn" data-mode="galaxy"><span class="e">🌌</span><span data-i18n="m_galaxy">银河行进</span></button>
-      <button id="realToggle" class="real-toggle">📐 真实比例</button>
+      <button class="mode-btn active" data-mode="day"><span class="e"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="7.4" stroke="currentColor" stroke-width="1.6"/><path d="M12 4.6a7.4 7.4 0 0 1 0 14.8z" fill="currentColor"/></svg></span><span data-i18n="m_day">日照 · 昼夜</span></button>
+      <button class="mode-btn" data-mode="moon"><span class="e"><svg viewBox="0 0 24 24" fill="none"><path d="M20 13.6A7.5 7.5 0 1 1 10.9 4.3 6 6 0 0 0 20 13.6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span><span data-i18n="m_moon">地月系统</span></button>
+      <button class="mode-btn" data-mode="orbit"><span class="e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="12" cy="12" rx="9" ry="4.2" transform="rotate(-25 12 12)"/><circle cx="12" cy="12" r="2.3" fill="currentColor" stroke="none"/><circle cx="19.4" cy="8.2" r="1.5" fill="currentColor" stroke="none"/></svg></span><span data-i18n="m_orbit">公转</span></button>
+      <button class="mode-btn" data-mode="solar"><span class="e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4.4"/><ellipse cx="12" cy="12" rx="10" ry="3.3" transform="rotate(-20 12 12)"/></svg></span><span data-i18n="m_solar">太阳系</span></button>
+      <button class="mode-btn" data-mode="galaxy"><span class="e"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.6c.6 4.1 1.7 5.3 5.8 6.4-4.1 1.1-5.2 2.3-5.8 6.4-.6-4.1-1.7-5.3-5.8-6.4 4.1-1.1 5.2-2.3 5.8-6.4Z" fill="currentColor"/><circle cx="19" cy="17.5" r="1" fill="currentColor"/><circle cx="5.5" cy="6" r=".9" fill="currentColor"/></svg></span><span data-i18n="m_galaxy">银河行进</span></button>
+      <button id="realToggle" class="real-toggle">真实比例</button>
      </div>
     </nav>
     <div class="canvas-card">
       <div class="fs-toolbar" aria-label="全屏控制">
-        <button class="mode-btn active" data-mode="day"><span class="e">🌗</span><span data-i18n="m_day">日照 · 昼夜</span></button>
-        <button class="mode-btn" data-mode="moon"><span class="e">🌙</span><span data-i18n="m_moon">地月系统</span></button>
-        <button class="mode-btn" data-mode="orbit"><span class="e">🔄</span><span data-i18n="m_orbit">公转</span></button>
-        <button class="mode-btn" data-mode="solar"><span class="e">🪐</span><span data-i18n="m_solar">太阳系</span></button>
-        <button class="mode-btn" data-mode="galaxy"><span class="e">🌌</span><span data-i18n="m_galaxy">银河行进</span></button>
-        <button class="real-toggle">📐 真实比例</button>
+        <button class="mode-btn active" data-mode="day"><span class="e"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="7.4" stroke="currentColor" stroke-width="1.6"/><path d="M12 4.6a7.4 7.4 0 0 1 0 14.8z" fill="currentColor"/></svg></span><span data-i18n="m_day">日照 · 昼夜</span></button>
+        <button class="mode-btn" data-mode="moon"><span class="e"><svg viewBox="0 0 24 24" fill="none"><path d="M20 13.6A7.5 7.5 0 1 1 10.9 4.3 6 6 0 0 0 20 13.6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span><span data-i18n="m_moon">地月系统</span></button>
+        <button class="mode-btn" data-mode="orbit"><span class="e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="12" cy="12" rx="9" ry="4.2" transform="rotate(-25 12 12)"/><circle cx="12" cy="12" r="2.3" fill="currentColor" stroke="none"/><circle cx="19.4" cy="8.2" r="1.5" fill="currentColor" stroke="none"/></svg></span><span data-i18n="m_orbit">公转</span></button>
+        <button class="mode-btn" data-mode="solar"><span class="e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4.4"/><ellipse cx="12" cy="12" rx="10" ry="3.3" transform="rotate(-20 12 12)"/></svg></span><span data-i18n="m_solar">太阳系</span></button>
+        <button class="mode-btn" data-mode="galaxy"><span class="e"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.6c.6 4.1 1.7 5.3 5.8 6.4-4.1 1.1-5.2 2.3-5.8 6.4-.6-4.1-1.7-5.3-5.8-6.4 4.1-1.1 5.2-2.3 5.8-6.4Z" fill="currentColor"/><circle cx="19" cy="17.5" r="1" fill="currentColor"/><circle cx="5.5" cy="6" r=".9" fill="currentColor"/></svg></span><span data-i18n="m_galaxy">银河行进</span></button>
+        <button class="real-toggle">真实比例</button>
       </div>
       <div class="badge" data-i18n="badge">交互式 3D · 拖动旋转 · 滚轮缩放</div>
       <div class="scene-tag" id="sceneTag">—</div>
@@ -407,7 +413,7 @@ const I18N={
   tags:{day:'日照 · 昼夜',moon:'地月系统',orbit:'公转 · 四季 · 距离',solar:'太阳系',galaxy:'银河行进'},
   hints:{day:'🖱 拖动旋转 · 金色弧=该纬线的白昼段',moon:'🖱 看月球绕地球 · 明暗即月相',orbit:'🖱 椭圆轨道 · 注意日地距离变化',solar:'🖱 行星各自绕日 · 滚轮缩放',galaxy:'🖱 镜头跟随太阳 · 看它绕银心运动'},
   scaleNotes:{day:'⚠ 比例示意：太阳大小与日地距离非真实比例（真实太阳更大、更远）',moon:'⚠ 比例示意：月球大小与月地距离非真实比例（真实月地≈30个地球直径）',orbit:'⚠ 比例示意：轨道接近真实近圆；地球/太阳大小非真实比例',solar:'⚠ 比例示意：行星大小与轨道间距非真实比例',galaxy:'⚠ 比例示意：恒星数量/大小为象征；行星轨道与上下摆动幅度已放大'},
-  real_sch:'📐 真实比例',real_real:'📐 示意比例',scale_moon_real:'✔ 真实比例：月球在约 60 个地球半径外、直径仅地球的 1/4（拖动缩放观察）',scale_solar_real:'✔ 真实比例：大小与日距同尺度真实、太阳系极空旷。行星亮点仅为位置标记、非真实大小；太阳为真实大小',scale_day_real:'✔ 真实比例：太阳居中、地球在 1 AU 处绕太阳公转（太小显示为亮点）。此模式不演示昼夜',scale_orbit_real:'✔ 真实比例：地球在 1 AU 处绕太阳；太小显示为亮点。太阳半径仅 1 AU 的 1/215',scale_galaxy_real:'✔ 真实比例：可见整个银河系；太阳系太小、仅显示为一个亮点',scale_real_na:'⚠ 该模式真实比例下天体过小/过远、无法有效显示，已保持示意',
+  real_sch:'真实比例',real_real:'示意比例',scale_moon_real:'✔ 真实比例：月球在约 60 个地球半径外、直径仅地球的 1/4（拖动缩放观察）',scale_solar_real:'✔ 真实比例：大小与日距同尺度真实、太阳系极空旷。行星亮点仅为位置标记、非真实大小；太阳为真实大小',scale_day_real:'✔ 真实比例：太阳居中、地球在 1 AU 处绕太阳公转（太小显示为亮点）。此模式不演示昼夜',scale_orbit_real:'✔ 真实比例：地球在 1 AU 处绕太阳；太小显示为亮点。太阳半径仅 1 AU 的 1/215',scale_galaxy_real:'✔ 真实比例：可见整个银河系；太阳系太小、仅显示为一个亮点',scale_real_na:'⚠ 该模式真实比例下天体过小/过远、无法有效显示，已保持示意',
   planets:['水星','金星','地球','火星','木星','土星','天王星','海王星'],
   period:(T)=> T<1? `周期 ${Math.round(T*12)} 月` : `周期 ${T} 年`,
   cmp:['赤道','北回归线','中纬度','中高纬','北极圈','北极点'],
@@ -415,7 +421,7 @@ const I18N={
   cmpDay:'极昼 24h',cmpNight:'极夜 0h',
   phases:['新月','娥眉月','上弦月','盈凸月','满月','亏凸月','下弦月','残月'],
   latN:'N',latS:'S',eqLabel:'0° 赤道',
-  theme_light:'🌙 调暗',theme_dark:'🌗 调亮',langBtn:'EN',labelsBtn:'🏷 名称'
+  theme_light:'调暗',theme_dark:'调亮',langBtn:'EN',labelsBtn:'🏷 名称'
  },
  en:{
   title:'Celestial Motion &amp; Daylight',
@@ -460,7 +466,7 @@ const I18N={
   tags:{day:'Daylight',moon:'Earth–Moon',orbit:'Orbit · Seasons',solar:'Solar System',galaxy:'Through the Galaxy'},
   hints:{day:'🖱 drag · golden arc = the daylight part of that latitude',moon:'🖱 watch the Moon orbit · light/dark = phase',orbit:'🖱 elliptical orbit · watch the distance change',solar:'🖱 planets orbit the Sun · scroll to zoom',galaxy:'🖱 camera follows the Sun as it orbits the core'},
   scaleNotes:{day:'⚠ Schematic: Sun size & Earth–Sun distance not to scale (real Sun is far larger & farther)',moon:'⚠ Schematic: Moon size & distance not to scale (real distance ≈ 30 Earth diameters)',orbit:'⚠ Schematic: orbit near-real (almost circular); Earth/Sun sizes not to scale',solar:'⚠ Schematic: planet sizes & orbital spacing not to scale',galaxy:'⚠ Schematic: star count/size symbolic; planet orbits & vertical wobble exaggerated'},
-  real_sch:'📐 True scale',real_real:'📐 Schematic',scale_moon_real:'✔ True scale: the Moon is ~60 Earth-radii away and only ¼ of Earth\'s size (drag/zoom to explore)',scale_solar_real:'✔ True scale: sizes & distances on one real scale; space is mostly empty. Planet dots are position markers (not real size); the Sun is shown at real size',scale_day_real:'✔ True scale: Sun at center, Earth orbits at 1 AU (too small → a dot). Daylight demo off here',scale_orbit_real:'✔ True scale: Earth orbits at 1 AU; too small, shown as a dot. Sun radius is only 1/215 of 1 AU',scale_galaxy_real:'✔ True scale: the whole galaxy is in view; the solar system is too small — shown as a single dot',scale_real_na:'⚠ True scale not viewable here (bodies become tiny/too far); kept schematic',
+  real_sch:'True scale',real_real:'Schematic',scale_moon_real:'✔ True scale: the Moon is ~60 Earth-radii away and only ¼ of Earth\'s size (drag/zoom to explore)',scale_solar_real:'✔ True scale: sizes & distances on one real scale; space is mostly empty. Planet dots are position markers (not real size); the Sun is shown at real size',scale_day_real:'✔ True scale: Sun at center, Earth orbits at 1 AU (too small → a dot). Daylight demo off here',scale_orbit_real:'✔ True scale: Earth orbits at 1 AU; too small, shown as a dot. Sun radius is only 1/215 of 1 AU',scale_galaxy_real:'✔ True scale: the whole galaxy is in view; the solar system is too small — shown as a single dot',scale_real_na:'⚠ True scale not viewable here (bodies become tiny/too far); kept schematic',
   planets:['Mercury','Venus','Earth','Mars','Jupiter','Saturn','Uranus','Neptune'],
   period:(T)=> T<1? `period ${Math.round(T*12)} mo` : `period ${T} yr`,
   cmp:['Equator','Tropic','Mid-lat','High-mid','Arctic Circle','North Pole'],
@@ -468,7 +474,7 @@ const I18N={
   cmpDay:'Polar day 24h',cmpNight:'Polar night 0h',
   phases:['New','Waxing crescent','First quarter','Waxing gibbous','Full','Waning gibbous','Last quarter','Waning crescent'],
   latN:'N',latS:'S',eqLabel:'0° Equator',
-  theme_light:'🌙 Dark',theme_dark:'🌗 Light',langBtn:'中文',labelsBtn:'🏷 Labels'
+  theme_light:'Dark',theme_dark:'Light',langBtn:'中文',labelsBtn:'🏷 Labels'
  }
 };
 
